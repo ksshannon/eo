@@ -12,7 +12,6 @@ import (
 
 func main() {
 	// Parse everything in the data file
-
 	dataFiles, err := ioutil.ReadDir("./data")
 
 	if err != nil {
@@ -26,6 +25,7 @@ func main() {
 		"title",
 		"president",
 		"revokes",
+		"revokee",
 		"full_revoke_comment",
 	})
 
@@ -41,15 +41,20 @@ func main() {
 			panic(fmt.Sprintf("failed to parse %s", fname.Name()))
 		}
 
+		var tmpOrder eo.ExecOrder
 		for _, e := range eos {
 			rev := e.Revokes()
 			if rev != nil {
 				for _, r := range rev {
+					tmpOrder.Number = fmt.Sprintf("%d", r)
+					w, _ := e.Whom()
+					_, tw := tmpOrder.Whom()
 					cout.Write([]string{
 						e.Number,
 						e.Title,
-						e.Whom(),
+						w,
 						fmt.Sprintf("%d", r),
+						fmt.Sprintf("%d", tw),
 						e.Notes["Revokes"],
 					})
 				}

@@ -31,19 +31,20 @@ var starts = []struct {
 	{"Barack Obama", 13489},
 }
 
-func whom(order int) string {
-	for i := 1; i < len(starts); i++ {
+func whom(order int) (string, int) {
+	var i int
+	for i = 1; i < len(starts); i++ {
 		if starts[i].start >= order {
-			return starts[i-1].whom
+			return starts[i-1].whom, i
 		}
 	}
-	return starts[len(starts)-1].whom
+	return starts[len(starts)-1].whom, i
 }
 
-func (e *ExecOrder) Whom() string {
+func (e *ExecOrder) Whom() (string, int) {
 	n, err := strconv.Atoi(e.Number)
 	if err != nil {
-		return ""
+		return "", -1
 	}
 	return whom(n)
 }

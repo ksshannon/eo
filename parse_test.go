@@ -106,8 +106,9 @@ func TestWhom(t *testing.T) {
 	var e ExecOrder
 	for _, test := range tests {
 		e.Number = fmt.Sprintf("%d", test.num)
-		if e.Whom() != test.name {
-			t.Errorf("invalid whom, expected %s, got %s for %d", e.Whom(), test.name, test.num)
+		w, _ := e.Whom()
+		if w != test.name {
+			t.Errorf("invalid whom, expected %s, got %s for %d", w, test.name, test.num)
 		}
 	}
 }
