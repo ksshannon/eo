@@ -1,8 +1,11 @@
 package eo
 
 import (
+	"encoding/csv"
 	"fmt"
+	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -105,6 +108,38 @@ func TestWhom(t *testing.T) {
 		e.Number = fmt.Sprintf("%d", test.num)
 		if e.Whom() != test.name {
 			t.Errorf("invalid whom, expected %s, got %s for %d", e.Whom(), test.name, test.num)
+		}
+	}
+}
+
+// Just attempt to parse all files to weasel out data issues
+func TestParseAll(t *testing.T) {
+
+	dataFiles, err := ioutil.ReadDir("./data")
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fout := os.Stdout
+	cout := csv.NewWriter(fout)
+	cout.Write([]string{
+		"eo",
+		"title",
+		"president",
+		"revokes",
+	})
+
+	for _, fname := range dataFiles {
+		fin, err := os.Open(filepath.Join("data", fname.Name()))
+		if err != nil {
+			panic(err)
+		}
+		defer fin.Close()
+
+		eos := ParseExecOrders(fin)
+		if eos == nil {
+			t.Fatal(fmt.Sprintf("failed to parse %s", fname.Name()))
 		}
 	}
 }
