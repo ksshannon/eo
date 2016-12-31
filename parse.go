@@ -8,7 +8,7 @@ import (
 
 const delimiter = "Executive Order"
 
-func parseExecOrders(r io.Reader) []ExecOrder {
+func ParseExecOrders(r io.Reader) []ExecOrder {
 	var e ExecOrder
 	var eos []ExecOrder
 	scn := bufio.NewScanner(r)

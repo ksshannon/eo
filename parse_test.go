@@ -1,6 +1,7 @@
 package eo
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -9,7 +10,7 @@ import (
 func TestParse1937(t *testing.T) {
 	fin, _ := os.Open("data/1937.txt")
 	defer fin.Close()
-	eos := parseExecOrders(fin)
+	eos := ParseExecOrders(fin)
 	if eos == nil {
 		t.Fatal("parsing failed")
 	}
@@ -35,7 +36,7 @@ func TestParse1937(t *testing.T) {
 func TestParse1983(t *testing.T) {
 	fin, _ := os.Open("data/1983.txt")
 	defer fin.Close()
-	eos := parseExecOrders(fin)
+	eos := ParseExecOrders(fin)
 	if eos == nil {
 		t.Fatal("parsing failed")
 	}
@@ -58,7 +59,7 @@ func TestParse1983(t *testing.T) {
 func TestMultiRevoke(t *testing.T) {
 	fin, _ := os.Open("data/1979.txt")
 	defer fin.Close()
-	eos := parseExecOrders(fin)
+	eos := ParseExecOrders(fin)
 	if eos == nil {
 		t.Fatal("parsing failed")
 	}
@@ -78,5 +79,32 @@ func TestMultiRevoke(t *testing.T) {
 	}
 	if !found {
 		t.Error("didn't find 10242 in the revoke notes")
+	}
+}
+
+func TestWhom(t *testing.T) {
+	tests := []struct {
+		name string
+		num  int
+	}{
+		{
+			"Barack Obama",
+			13500,
+		},
+		{
+			"Harry S. Truman",
+			9540,
+		},
+		{
+			"Ronald Reagan",
+			12300,
+		},
+	}
+	var e ExecOrder
+	for _, test := range tests {
+		e.Number = fmt.Sprintf("%d", test.num)
+		if e.Whom() != test.name {
+			t.Errorf("invalid whom, expected %s, got %s for %d", e.Whom(), test.name, test.num)
+		}
 	}
 }
