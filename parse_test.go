@@ -135,6 +135,7 @@ func TestParseAll(t *testing.T) {
 		"revokes",
 	})
 
+	var allOrders []ExecOrder
 	for _, fname := range dataFiles {
 		fin, err := os.Open(filepath.Join("data", fname.Name()))
 		if err != nil {
@@ -146,6 +147,20 @@ func TestParseAll(t *testing.T) {
 		if eos == nil {
 			t.Fatal(fmt.Sprintf("failed to parse %s", fname.Name()))
 		}
+		allOrders = append(allOrders, eos...)
+	}
+	missed := 0
+	for _, e := range allOrders {
+		rev := e.Revokes()
+		for _, r := range rev {
+			if r < 1000 {
+				t.Logf("EO %s revokes a low eo #: %d", e.Number, r)
+				missed++
+			}
+		}
+	}
+	if missed > 0 {
+		t.Logf("missed a total of %d", missed)
 	}
 }
 
