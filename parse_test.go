@@ -143,3 +143,47 @@ func TestParseAll(t *testing.T) {
 		}
 	}
 }
+
+func TestRevokesInPart(t *testing.T) {
+	dataFiles, err := ioutil.ReadDir("./data")
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fout := os.Stdout
+	cout := csv.NewWriter(fout)
+	cout.Write([]string{
+		"eo",
+		"title",
+		"president",
+		"revokes",
+	})
+
+	conflict := 0
+
+	for _, fname := range dataFiles {
+		fin, err := os.Open(filepath.Join("data", fname.Name()))
+		if err != nil {
+			panic(err)
+		}
+		defer fin.Close()
+
+		eos := ParseExecOrders(fin)
+		if eos == nil {
+			t.Fatal(fmt.Sprintf("failed to parse %s", fname.Name()))
+		}
+		for _, e := range eos {
+			if _, hasInPart := e.Notes["Revokes in part"]; hasInPart == true {
+				if strings.Index("in part", strings.ToLower(e.Notes["Revokes"])) >= 0 {
+					t.Logf("file: %s eo: %s has revokes(in part): %s and revokes: %s",
+						fname.Name(), e.Number, e.Notes["Revokes"], e.Notes["Revokes in part"])
+					conflict++
+				}
+			}
+		}
+	}
+	if conflict > 0 {
+		t.Logf("%d conflicts in revoke/revoke in part", conflict)
+	}
+}
