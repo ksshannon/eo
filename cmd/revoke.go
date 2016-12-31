@@ -26,6 +26,7 @@ func main() {
 		"title",
 		"president",
 		"revokes",
+		"full_revoke_comment",
 	})
 
 	for _, fname := range dataFiles {
@@ -41,13 +42,17 @@ func main() {
 		}
 
 		for _, e := range eos {
-			if e.Notes["Revokes"] != "" {
-				cout.Write([]string{
-					e.Number,
-					e.Title,
-					e.Whom(),
-					e.Notes["Revokes"],
-				})
+			rev := e.Revokes()
+			if rev != nil {
+				for _, r := range rev {
+					cout.Write([]string{
+						e.Number,
+						e.Title,
+						e.Whom(),
+						fmt.Sprintf("%d", r),
+						e.Notes["Revokes"],
+					})
+				}
 			}
 		}
 	}
