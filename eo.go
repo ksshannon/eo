@@ -32,6 +32,9 @@ var starts = []struct {
 }
 
 func whom(order int) (string, int) {
+	if order < 6071 {
+		return "", -1
+	}
 	var i int
 	for i = 1; i < len(starts); i++ {
 		if starts[i].start >= order {

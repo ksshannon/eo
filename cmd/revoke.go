@@ -26,6 +26,7 @@ func main() {
 		"president",
 		"revokes",
 		"revokee",
+		"revokee_id",
 		"full_revoke_comment",
 	})
 
@@ -48,13 +49,17 @@ func main() {
 				for _, r := range rev {
 					tmpOrder.Number = fmt.Sprintf("%d", r)
 					w, _ := e.Whom()
-					_, tw := tmpOrder.Whom()
+					tw, twi := tmpOrder.Whom()
+					if twi < 0 {
+						tw = "UNKNOWN"
+					}
 					cout.Write([]string{
 						e.Number,
-						e.Title,
+						fmt.Sprintf(`"%s"`, e.Title),
 						w,
 						fmt.Sprintf("%d", r),
-						fmt.Sprintf("%d", tw),
+						tw,
+						fmt.Sprintf("%d", twi),
 						e.Notes["Revokes"],
 					})
 				}
