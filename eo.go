@@ -52,7 +52,7 @@ func (e *ExecOrder) Whom() (string, int) {
 	return whom(n)
 }
 
-var eoMatch = regexp.MustCompile(`EO [0-9]{4,5}`)
+var eoMatch = regexp.MustCompile(`EO [0-9]+`)
 
 func (e *ExecOrder) Revokes() []int {
 	var n []int
