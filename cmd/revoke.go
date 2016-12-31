@@ -22,6 +22,7 @@ func main() {
 	cout := csv.NewWriter(fout)
 	cout.Write([]string{
 		"eo",
+		"signed",
 		"title",
 		"president",
 		"revokes",
@@ -55,6 +56,7 @@ func main() {
 					}
 					cout.Write([]string{
 						e.Number,
+						e.Notes["Signed"],
 						fmt.Sprintf(`"%s"`, e.Title),
 						w,
 						fmt.Sprintf("%d", r),
