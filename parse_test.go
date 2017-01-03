@@ -234,3 +234,7 @@ func TestRevokesInPart(t *testing.T) {
 		t.Logf("%d conflicts in revoke/revoke in part", conflict)
 	}
 }
+
+func TestAlphaEO(t *testing.T) {
+	t.Skip("FIXME: test for EOs such as 7456-B in revoke list and ExecOrder.Number")
+}
