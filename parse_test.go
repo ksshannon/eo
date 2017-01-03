@@ -14,14 +14,18 @@ import (
 	"testing"
 )
 
+func TestParseInvalidYear(t *testing.T) {
+	eos := ParseExecOrdersIn(1900)
+	if eos == nil {
+		t.Fatalf("opened non-existent year")
+	}
+}
+
 func TestParse1937(t *testing.T) {
-	fin, _ := os.Open("data/1937.txt")
-	defer fin.Close()
-	eos := ParseExecOrders(fin)
+	eos := ParseExecOrdersIn(1937)
 	if eos == nil {
 		t.Fatal("parsing failed")
 	}
-
 	// Check the data in the first order
 	e := eos[0]
 	if e.Number != "7532" {
@@ -41,9 +45,7 @@ func TestParse1937(t *testing.T) {
 }
 
 func TestParse1983(t *testing.T) {
-	fin, _ := os.Open("data/1983.txt")
-	defer fin.Close()
-	eos := ParseExecOrders(fin)
+	eos := ParseExecOrdersIn(1983)
 	if eos == nil {
 		t.Fatal("parsing failed")
 	}
@@ -64,9 +66,7 @@ func TestParse1983(t *testing.T) {
 }
 
 func TestMultiRevoke(t *testing.T) {
-	fin, _ := os.Open("data/1979.txt")
-	defer fin.Close()
-	eos := ParseExecOrders(fin)
+	eos := ParseExecOrdersIn(1979)
 	if eos == nil {
 		t.Fatal("parsing failed")
 	}
@@ -86,34 +86,6 @@ func TestMultiRevoke(t *testing.T) {
 	}
 	if !found {
 		t.Error("didn't find 10242 in the revoke notes")
-	}
-}
-
-func TestWhom(t *testing.T) {
-	tests := []struct {
-		name string
-		num  int
-	}{
-		{
-			"Barack Obama",
-			13500,
-		},
-		{
-			"Harry S. Truman",
-			9540,
-		},
-		{
-			"Ronald Reagan",
-			12300,
-		},
-	}
-	var e ExecOrder
-	for _, test := range tests {
-		e.Number = fmt.Sprintf("%d", test.num)
-		w, _ := e.Whom()
-		if w != test.name {
-			t.Errorf("invalid whom, expected %s, got %s for %d", w, test.name, test.num)
-		}
 	}
 }
 
@@ -154,7 +126,6 @@ func TestParseAll(t *testing.T) {
 		rev := e.Revokes()
 		for _, r := range rev {
 			if r < 1000 {
-				t.Logf("EO %s revokes a low eo #: %d", e.Number, r)
 				missed++
 			}
 		}

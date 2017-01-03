@@ -6,9 +6,26 @@ package eo
 
 import (
 	"bufio"
+	"fmt"
 	"io"
+	"os"
+	"path/filepath"
 	"strings"
 )
+
+func ParseExecOrdersIn(year int) []ExecOrder {
+	fname := filepath.Join(".", "data", fmt.Sprintf("%d.txt", year))
+	st, err := os.Stat(fname)
+	if err != nil || st.IsDir() {
+		return nil
+	}
+	fin, err := os.Open(fname)
+	if err != nil {
+		return nil
+	}
+	defer fin.Close()
+	return ParseExecOrders(fin)
+}
 
 const delimiter = "Executive Order"
 
