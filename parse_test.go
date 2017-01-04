@@ -343,3 +343,34 @@ func TestCount(t *testing.T) {
 		m[w]++
 	}
 }
+
+func TestRevokeString(t *testing.T) {
+	eos := ParseExecOrdersIn(1940)
+	var found bool
+	var eo ExecOrder
+	for _, e := range eos {
+		if e.Number == "8346" {
+			eo = e
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Fatal("failed to find eo")
+	}
+	s := eo.RevokeStrings()
+	if s == nil {
+		t.Error("failed to parse strings")
+	}
+
+	found = false
+	for _, r := range s {
+		if r == "EO 3653-A" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Error("failed to find EO 3653-A")
+	}
+}

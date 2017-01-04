@@ -79,3 +79,16 @@ func (e *ExecOrder) Revokes() []int {
 	}
 	return n
 }
+
+var revokeStringMatch = regexp.MustCompile(`EO [0-9]+(-[A-Z])?`)
+
+func (e *ExecOrder) RevokeStrings() []string {
+	var s []string
+	tokens := strings.Split(e.Notes["Revokes"], ";")
+	for _, t := range tokens {
+		if m := revokeStringMatch.FindString(t); m != "" {
+			s = append(s, m)
+		}
+	}
+	return s
+}
