@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
@@ -48,6 +49,8 @@ func ParseAllOrders(path string) ([]ExecOrder, error) {
 
 const delimiter = "Executive Order"
 
+var delimitRE = regexp.MustCompile(`Executive Order [0-9]+`)
+
 func ParseExecOrders(r io.Reader) []ExecOrder {
 	var e ExecOrder
 	var eos []ExecOrder
@@ -57,7 +60,7 @@ func ParseExecOrders(r io.Reader) []ExecOrder {
 		if text == "" {
 			continue
 		}
-		if strings.HasPrefix(text, delimiter) {
+		if delimitRE.MatchString(text) {
 			eos = append(eos, e)
 			n := strings.TrimSpace(text[len(delimiter):])
 			e.Number = n

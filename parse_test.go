@@ -190,3 +190,25 @@ func TestAlphaEO(t *testing.T) {
 		t.Error("failed to parse alpha eo 7677-A")
 	}
 }
+
+// Issues with this specific order
+func Test9379(t *testing.T) {
+	eos := ParseExecOrdersIn(1943)
+	if eos == nil {
+		t.Fatal("failed to parse")
+	}
+	const n = "9379"
+	var found bool
+	for _, e := range eos {
+		if e.Number == n {
+			found = true
+			if e.Title == "" {
+				t.Error("failed to extract title")
+			}
+			break
+		}
+	}
+	if !found {
+		t.Error("failed to find 9379")
+	}
+}

@@ -33,6 +33,9 @@ func main() {
 
 	for _, e := range eos {
 		w, _ := e.Whom()
+		if w == "" {
+			fmt.Printf("%+v\n", e)
+		}
 		who := m[w]
 		who.total++
 		revoked := e.Revokes()
