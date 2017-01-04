@@ -33,7 +33,7 @@ func main() {
 
 	for _, e := range eos {
 		w, _ := e.Whom()
-		if w == "" {
+		if w == "Unknown" {
 			fmt.Printf("%+v\n", e)
 		}
 		who := m[w]

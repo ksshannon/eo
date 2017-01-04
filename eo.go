@@ -48,10 +48,12 @@ func whom(order int) (string, int) {
 	return starts[len(starts)-1].whom, i
 }
 
-var eoMatch = regexp.MustCompile(`[0-9]+`)
+var eoMatch = regexp.MustCompile(`[0-9]+(-[A-Z])?`)
+var revokeMatch = regexp.MustCompile(`EO [0-9]+`)
+var numMatch = regexp.MustCompile(`[0-9]+`)
 
 func (e *ExecOrder) Whom() (string, int) {
-	m := eoMatch.FindString(e.Number)
+	m := numMatch.FindString(e.Number)
 	if m == "" {
 		return m, -1
 	}
@@ -61,8 +63,6 @@ func (e *ExecOrder) Whom() (string, int) {
 	}
 	return whom(n)
 }
-
-var revokeMatch = regexp.MustCompile(`EO [0-9]+`)
 
 func (e *ExecOrder) Revokes() []int {
 	var n []int

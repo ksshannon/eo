@@ -49,7 +49,8 @@ func ParseAllOrders(path string) ([]ExecOrder, error) {
 
 const delimiter = "Executive Order"
 
-var delimitRE = regexp.MustCompile(`Executive Order [0-9]+`)
+//var delimitRE = regexp.MustCompile(`^Executive Order [0-9]+(-[A-Z])?`)
+var delimitRE = regexp.MustCompile(`^Executive Order [0-9]+(-[A-Z])?$`)
 
 func ParseExecOrders(r io.Reader) []ExecOrder {
 	var e ExecOrder
@@ -62,7 +63,7 @@ func ParseExecOrders(r io.Reader) []ExecOrder {
 		}
 		if delimitRE.MatchString(text) {
 			eos = append(eos, e)
-			n := strings.TrimSpace(text[len(delimiter):])
+			n := eoMatch.FindString(text)
 			e.Number = n
 			e.Title = ""
 			e.Notes = make(map[string]string)
