@@ -13,7 +13,7 @@ func TestWhom(t *testing.T) {
 	tests := []struct {
 		name string
 		i    int
-	}{{"", 1},
+	}{{"Unknown", 1},
 		{"Franklin D. Roosevelt", 6071},
 		{"Franklin D. Roosevelt", 9537},
 		{"Harry S. Truman", 9540},
