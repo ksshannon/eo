@@ -331,3 +331,15 @@ func TestMisses(t *testing.T) {
 		}
 	}
 }
+
+func TestCount(t *testing.T) {
+	m := make(map[string]int)
+	eos, err := ParseAllOrders("./data")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, e := range eos {
+		w, _ := e.Whom()
+		m[w]++
+	}
+}
