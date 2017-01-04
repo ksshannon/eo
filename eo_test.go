@@ -18,7 +18,7 @@ func TestWhom(t *testing.T) {
 		{"Franklin D. Roosevelt", 9537},
 		{"Harry S. Truman", 9540},
 		{"Ronald Reagan", 12300},
-		//{"Barack Obama", 13489}, // FIXME(kyle): failing
+		{"Barack Obama", 13489}, // FIXME(kyle): failing
 		{"Barack Obama", 13490},
 		{"Barack Obama", 13500},
 		{"Barack Obama", 20000},
@@ -41,7 +41,6 @@ func TestWhomAlpha(t *testing.T) {
 	e := ExecOrder{Number: "6071-A"}
 	w, _ := e.Whom()
 	if w != "Franklin D. Roosevelt" {
-		t.Skip("fixing...")
 		t.Errorf("whom failed with alpha")
 	}
 }

@@ -16,7 +16,7 @@ import (
 
 func TestParseInvalidYear(t *testing.T) {
 	eos := ParseExecOrdersIn(1900)
-	if eos == nil {
+	if eos != nil {
 		t.Fatalf("opened non-existent year")
 	}
 }
@@ -91,47 +91,12 @@ func TestMultiRevoke(t *testing.T) {
 
 // Just attempt to parse all files to weasel out data issues
 func TestParseAll(t *testing.T) {
-
-	dataFiles, err := ioutil.ReadDir("./data")
-
+	allOrders, err := ParseAllOrders("./data")
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	fout := os.Stdout
-	cout := csv.NewWriter(fout)
-	cout.Write([]string{
-		"eo",
-		"title",
-		"president",
-		"revokes",
-	})
-
-	var allOrders []ExecOrder
-	for _, fname := range dataFiles {
-		fin, err := os.Open(filepath.Join("data", fname.Name()))
-		if err != nil {
-			panic(err)
-		}
-		defer fin.Close()
-
-		eos := ParseExecOrders(fin)
-		if eos == nil {
-			t.Fatal(fmt.Sprintf("failed to parse %s", fname.Name()))
-		}
-		allOrders = append(allOrders, eos...)
-	}
-	missed := 0
-	for _, e := range allOrders {
-		rev := e.Revokes()
-		for _, r := range rev {
-			if r < 1000 {
-				missed++
-			}
-		}
-	}
-	if missed > 0 {
-		t.Logf("missed a total of %d", missed)
+	if len(allOrders) < 1 {
+		t.Fatal("failed to parse")
 	}
 }
 
@@ -207,5 +172,21 @@ func TestRevokesInPart(t *testing.T) {
 }
 
 func TestAlphaEO(t *testing.T) {
-	t.Skip("FIXME: test for EOs such as 7456-B in revoke list and ExecOrder.Number")
+	// 1037 has 7677-A
+	eos := ParseExecOrdersIn(1937)
+	if eos == nil {
+		t.Fatalf("failed to parse 1937")
+	}
+	found := false
+	for _, e := range eos {
+		if e.Number == "7677-A" {
+			found = true
+			if w, _ := e.Whom(); w != "Franklin D. Roosevelt" {
+				t.Errorf("Whom failed on AlphaEO: %s", w)
+			}
+		}
+	}
+	if !found {
+		t.Error("failed to parse alpha eo 7677-A")
+	}
 }

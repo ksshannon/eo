@@ -8,6 +8,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -25,6 +26,24 @@ func ParseExecOrdersIn(year int) []ExecOrder {
 	}
 	defer fin.Close()
 	return ParseExecOrders(fin)
+}
+
+func ParseAllOrders(path string) ([]ExecOrder, error) {
+	dataFiles, err := ioutil.ReadDir(path)
+	if err != nil {
+		return nil, err
+	}
+
+	var allOrders []ExecOrder
+	for _, fname := range dataFiles {
+		fin, err := os.Open(filepath.Join(path, fname.Name()))
+		if err != nil {
+			return nil, err
+		}
+		defer fin.Close()
+		allOrders = append(allOrders, ParseExecOrders(fin)...)
+	}
+	return allOrders, nil
 }
 
 const delimiter = "Executive Order"
