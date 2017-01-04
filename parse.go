@@ -35,6 +35,8 @@ func ParseAllOrders(path string) ([]ExecOrder, error) {
 		return nil, err
 	}
 
+	// TODO(kyle): skip files that don't match a year pattern
+
 	var allOrders []ExecOrder
 	for _, fname := range dataFiles {
 		fin, err := os.Open(filepath.Join(path, fname.Name()))
@@ -49,7 +51,6 @@ func ParseAllOrders(path string) ([]ExecOrder, error) {
 
 const delimiter = "Executive Order"
 
-//var delimitRE = regexp.MustCompile(`^Executive Order [0-9]+(-[A-Z])?`)
 var delimitRE = regexp.MustCompile(`^Executive Order [0-9]+(-[A-Z])?$`)
 
 func ParseExecOrders(r io.Reader) []ExecOrder {
