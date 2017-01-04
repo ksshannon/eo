@@ -79,6 +79,7 @@ func ParseExecOrders(r io.Reader) []ExecOrder {
 			}
 		}
 	}
+	eos = append(eos, e)
 	if len(eos) < 1 {
 		return nil
 	}
