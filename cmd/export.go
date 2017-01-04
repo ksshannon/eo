@@ -31,7 +31,7 @@ func main() {
 	var revokeeEO eo.ExecOrder
 	for _, e := range eos {
 		w, _ := e.Whom()
-		rs := e.RevokeStrings()
+		rs := e.RevokeStrings(true)
 		for _, revoke := range rs {
 			revokeeEO.Number = revoke
 			revokee, rid := revokeeEO.Whom()

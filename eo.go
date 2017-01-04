@@ -66,7 +66,6 @@ func (e *ExecOrder) Whom() (string, int) {
 
 func (e *ExecOrder) Revokes() []int {
 	var n []int
-
 	s := e.Notes["Revokes"]
 	tokens := strings.Split(s, ";")
 	for _, t := range tokens {
@@ -82,11 +81,14 @@ func (e *ExecOrder) Revokes() []int {
 
 var revokeStringMatch = regexp.MustCompile(`EO [0-9]+(-[A-Z])?`)
 
-func (e *ExecOrder) RevokeStrings() []string {
+func (e *ExecOrder) RevokeStrings(ignorePartial bool) []string {
 	var s []string
 	tokens := strings.Split(e.Notes["Revokes"], ";")
 	for _, t := range tokens {
 		if m := revokeStringMatch.FindString(t); m != "" {
+			if ignorePartial && strings.Index(t, "in part") >= 0 {
+				continue
+			}
 			s = append(s, m)
 		}
 	}

@@ -358,7 +358,7 @@ func TestRevokeString(t *testing.T) {
 	if !found {
 		t.Fatal("failed to find eo")
 	}
-	s := eo.RevokeStrings()
+	s := eo.RevokeStrings(false)
 	if s == nil {
 		t.Error("failed to parse strings")
 	}
@@ -374,7 +374,7 @@ func TestRevokeString(t *testing.T) {
 		t.Error("failed to find EO 3653-A")
 	}
 	// Make sure we extract the right amount of EOs in int and string versions
-	if len(eo.Revokes()) != len(eo.RevokeStrings()) {
+	if len(eo.Revokes()) != len(eo.RevokeStrings(false)) {
 		t.Error("length of Revokes() and RevokeStrings() mis-match")
 	}
 }
