@@ -373,4 +373,8 @@ func TestRevokeString(t *testing.T) {
 	if !found {
 		t.Error("failed to find EO 3653-A")
 	}
+	// Make sure we extract the right amount of EOs in int and string versions
+	if len(eo.Revokes()) != len(eo.RevokeStrings()) {
+		t.Error("length of Revokes() and RevokeStrings() mis-match")
+	}
 }
