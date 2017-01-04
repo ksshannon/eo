@@ -103,17 +103,20 @@ func TestParseAll(t *testing.T) {
 			last, err := strconv.Atoi(allOrders[i-1].Number)
 			if err == nil {
 				if this-last != 1 {
+					t.Log(last, this)
 					invalid++
 				}
 			}
 		}
 	}
 	// grep -E '^Executive Order [0-9]+(-[A-Z])?$' data/*.txt | wc -l
-	// reports 6242
-	if false && len(allOrders) != 6242 {
+	// reports 6240.  We are two
+	if len(allOrders) != 6240 {
 		t.Errorf("parsed %d orders, expected %d", len(allOrders), 6242)
 	}
-	t.Logf("possible invalid: %d", invalid)
+	if invalid > 0 {
+		t.Logf("possible invalid: %d", invalid)
+	}
 }
 
 func TestShortEONumber(t *testing.T) {
