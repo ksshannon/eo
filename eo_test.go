@@ -21,7 +21,7 @@ func TestWhom(t *testing.T) {
 		{"Barack Obama", 13489}, // FIXME(kyle): failing
 		{"Barack Obama", 13490},
 		{"Barack Obama", 13500},
-		{"Barack Obama", 20000},
+		{"Donald J. Trump", 20000},
 	}
 	var e ExecOrder
 	for _, test := range tests {

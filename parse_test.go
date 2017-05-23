@@ -111,8 +111,9 @@ func TestParseAll(t *testing.T) {
 	}
 	// grep -E '^Executive Order [0-9]+(-[A-Z])?$' data/*.txt | wc -l
 	// reports 6240.
-	if len(allOrders) != 6240 {
-		t.Errorf("parsed %d orders, expected %d", len(allOrders), 6242)
+	const orderCount = 6269
+	if len(allOrders) != orderCount {
+		t.Errorf("parsed %d orders, expected %d", len(allOrders), orderCount)
 	}
 	if invalid > 0 {
 		t.Logf("possible invalid: %d", invalid)
