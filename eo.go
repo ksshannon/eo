@@ -10,6 +10,8 @@ import (
 	"strings"
 )
 
+// Source: https://www.archives.gov/federal-register/executive-orders
+
 type ExecOrder struct {
 	Number string
 	Title  string

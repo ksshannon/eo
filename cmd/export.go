@@ -32,15 +32,6 @@ func main() {
 		panic(err)
 	}
 
-	freos, err := eo.FetchCurrent()
-	if err != nil {
-		panic(err)
-	}
-
-	eos = append(eos, freos...)
-
-	return
-
 	var revokeeEO eo.ExecOrder
 	for _, e := range eos {
 		w, _ := e.Whom()
