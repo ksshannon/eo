@@ -55,6 +55,7 @@ var delimitRE = regexp.MustCompile(`^Executive Order [0-9]+(-[A-Z])?$`)
 
 func ParseExecOrders(r io.Reader) []ExecOrder {
 	var e ExecOrder
+	e.Notes = make(map[string]string)
 	var eos []ExecOrder
 	scn := bufio.NewScanner(r)
 	for scn.Scan() {
