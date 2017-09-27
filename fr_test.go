@@ -5,6 +5,7 @@
 package eo
 
 import (
+	"fmt"
 	"strconv"
 	"testing"
 )
@@ -25,5 +26,37 @@ func TestFetch(t *testing.T) {
 			t.Logf("%+v", eo)
 		}
 		n = eon
+	}
+}
+
+func TestFetchAllOrders(t *testing.T) {
+	_, err := FetchAllOrders()
+	if err != nil {
+		t.Error(err)
+	}
+	oldEO := ParseExecOrdersIn(1998)
+	if oldEO == nil {
+		t.Error("failed to parse")
+	}
+	// Computer Software Piracy
+	// 13103
+	var golden ExecOrder
+	for _, eo := range oldEO {
+		if eo.Number == "13103" {
+			golden = eo
+			break
+		}
+	}
+	newEO, err := FetchAllOrders()
+	if err != nil {
+		t.Error(err)
+	}
+	for _, eo := range newEO {
+		if eo.Number == "13103" && eo.Title != golden.Title {
+			t.Errorf("%+v != %+v", golden, eo)
+			break
+		} else {
+			fmt.Printf("%+v\n%+v", eo.Notes, golden.Notes)
+		}
 	}
 }
