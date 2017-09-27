@@ -212,7 +212,9 @@ Creating an emergency board to investigate a dispute between the American Airlin
 Executive Order 11292
 Amending Executive Order No. 11157 as its relates to incentive pay for hazardous duty, and special pay for sea duty at certain places
 
-    Signed: August 1966
+    # FIXME(kyle): invalid date, setting to August 1 arbitrarily
+    # Old: Signed: August 1966
+    Signed: August 1, 1966
     Federal Register page and date: 31 FR 10447; August 4, 1966
     Amends: EO 11157, June 22, 1964
 

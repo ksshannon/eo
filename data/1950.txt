@@ -44,7 +44,9 @@ Regulations Relating to the Granting of Certain Allowances by the Director of Ce
 Executive Order 10101
 Amendment of Executive Order No. 9746 of July 1, 1946, Relating to the Panama Canal
 
-    Signed: January 31, 950
+    # Fixing missing '1' in year.
+    # Old: Signed: January 31, 950
+    Signed: January 31, 1950
     Federal Register page and date: 15 FR 595, February 3, 1950
     Amends: EO 9746, July 1, 1946
     Superseded by: EO 10595, February 7, 1955

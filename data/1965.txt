@@ -432,7 +432,9 @@ Providing for the coordination by the Attorney General of enforcement of Title V
 Executive Order 11248
 Placing certain positions in levels IV and V of the Federal Executive Salary Schedule
 
-    Signed: October 10 1965
+    # Fixing date format
+    # Old: Signed: October 10 1965
+    Signed: October 10, 1965
     Federal Register page and date: 30 FR 12999; October 13, 1965
     Supersedes: EO 11244, September 16, 1965; EO 11245, September 16, 1965
     Amended by: EO 11251, October 19, 1965; EO 11252, October 20, 1965; EO 11262, December 13, 1965; EO 11268, January 20, 1966; EO 11273, March 22, 1966; EO 11293, August 3, 1966; EO 11299, August 15, 1966; EO 11316, November 28, 1966; EO 11323, January 20, 1967; EO 11335, March 9, 1967; EO 11338, March 27, 1967; EO 11346, April 20, 1967; EO 11367, August 18, 1967; EO 11369, August 29, 1967; EO 11384, December 1, 1967; EO 11385, December 16, 1967; EO 11389, January 22, 1968; EO 11393, January 25, 1968; EO 11400, March 11, 1968; EO 11409, April 29, 1968; ; EO 11416, June 24, 1968; EO 11421, August 9, 1968; EO 11441, December 23, 1968; EO 11463, April 1, 1969; EO 11468, May 10, 1969; EO 11489, October 27, 1969; EO 11499, December 11, 1969; EO 11504, January 14, 1970; EO 11510, February 16, 1970; EO 11516, March 19, 1970; EO 11540, July 1, 1970; EO 11542, July 2, 1970; EO 11550, July 30, 1970; EO 11581, January 20, 1971; EO 11587, March 15, 1971; EO 11604, July 2, 1971; EO 11634, December 6, 1971; EO 11641, January 28, 1972; EO 11676, July 27, 1972; EO 11699, January 22, 1973

@@ -209,7 +209,9 @@ Amendment to Executive Order No. 12958
 Executive Order 12973
 Amendment to Executive Order No. 12901
 
-    Signed: September 27,1995
+    # Fixing date format
+    # Old: Signed: September 27,1995
+    Signed: September 27, 1995
     Federal Register page and date: 60 FR 51665; October 2, 1995
     Amends: EO 12901, March 3, 1994
 
