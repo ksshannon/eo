@@ -9,10 +9,12 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
+	"time"
 )
 
 func ParseExecOrdersIn(year int) []ExecOrder {
@@ -49,18 +51,31 @@ func ParseAllOrders(path string) ([]ExecOrder, error) {
 	return allOrders, nil
 }
 
+func parseSigned(s string) (time.Time, error) {
+	s = strings.TrimSpace(s)
+	// Check for the strange signings of FDR such as:
+	//
+	// EO 8467
+	// Signed: 5 FR 2468, July 4, 1940
+	if strings.Count(s, ",") > 1 {
+		s = strings.TrimSpace(s[strings.Index(s, ",")+1:])
+	}
+	return time.Parse("January 2, 2006", s)
+}
+
 const delimiter = "Executive Order"
 
 var delimitRE = regexp.MustCompile(`^Executive Order [0-9]+(-[A-Z])?$`)
 
 func ParseExecOrders(r io.Reader) []ExecOrder {
 	var e ExecOrder
+	var err error
 	e.Notes = make(map[string]string)
 	var eos []ExecOrder
 	scn := bufio.NewScanner(r)
 	for scn.Scan() {
 		text := strings.TrimSpace(scn.Text())
-		if text == "" {
+		if text == "" || strings.Index(text, "#") == 1 {
 			continue
 		}
 		if delimitRE.MatchString(text) {
@@ -76,6 +91,12 @@ func ParseExecOrders(r io.Reader) []ExecOrder {
 		} else {
 			tokens := strings.Split(text, ":")
 			if len(tokens) > 1 {
+				if tokens[0] == "Signed" {
+					e.Signed, err = parseSigned(tokens[1])
+					if err != nil {
+						log.Print(err)
+					}
+				}
 				e.Notes[tokens[0]] = strings.Join(tokens[1:], ":")
 			}
 		}

@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestParseInvalidYear(t *testing.T) {
@@ -378,4 +379,27 @@ func TestRevokeString(t *testing.T) {
 	if len(eo.Revokes()) != len(eo.RevokeStrings(false)) {
 		t.Error("length of Revokes() and RevokeStrings() mis-match")
 	}
+}
+
+func TestSigned(t *testing.T) {
+	tests := []struct {
+		n string
+		s time.Time
+	}{
+		{"7726", time.Date(1937, 10, 12, 0, 0, 0, 0, time.UTC)},
+		// Two 'Signed' keys
+		{"7729", time.Date(1937, 10, 16, 0, 0, 0, 0, time.UTC)},
+	}
+	eos := ParseExecOrdersIn(1937)
+	for _, test := range tests {
+		for _, eo := range eos {
+			if eo.Number == test.n && eo.Signed != test.s {
+				t.Errorf("signed mismatch, exp: %s, got %s", test.s, eo.Signed)
+			}
+		}
+	}
+}
+
+func TestFDR7729(t *testing.T) {
+
 }

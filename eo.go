@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // Source: https://www.archives.gov/federal-register/executive-orders
@@ -16,6 +17,7 @@ type ExecOrder struct {
 	Number string
 	Title  string
 	Notes  map[string]string
+	Signed time.Time
 }
 
 var starts = []struct {

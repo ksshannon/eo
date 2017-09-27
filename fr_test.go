@@ -5,7 +5,6 @@
 package eo
 
 import (
-	"fmt"
 	"strconv"
 	"testing"
 )
@@ -55,8 +54,6 @@ func TestFetchAllOrders(t *testing.T) {
 		if eo.Number == "13103" && eo.Title != golden.Title {
 			t.Errorf("%+v != %+v", golden, eo)
 			break
-		} else {
-			fmt.Printf("%+v\n%+v", eo.Notes, golden.Notes)
 		}
 	}
 }
