@@ -412,7 +412,8 @@ Administration of the Export Administration Act of 1969, as amended
     Federal Register page and date: 42 FR 35623; July 11, 1977
     Revokes: EO 11533, June 4, 1970; EO 11683, August 29, 1972; EO 11798, August 14, 1974; EO 11818, November 5, 1974; EO 11907, March 1, 1976; EO 11940, September 30, 1976
     Amended by: EO 12755, March 12, 1991; EO 13286, February 28, 2003
-    See: EO 11846, March 27, 1975; EO 12444, October 14, 1983; EO 12451, December 20, 1983; EO 12730, September 30, 1990; EO 12867, September 30, 1993; EO 12923, June 30, 1994; EO 12924, August 19, 1994; EO 12981of December 5, 1995; EO 13206, April 4, 2001; EO 13222, August 17, 2001
+    # Way down the line, fixed a missing space
+    See: EO 11846, March 27, 1975; EO 12444, October 14, 1983; EO 12451, December 20, 1983; EO 12730, September 30, 1990; EO 12867, September 30, 1993; EO 12923, June 30, 1994; EO 12924, August 19, 1994; EO 12981 of December 5, 1995; EO 13206, April 4, 2001; EO 13222, August 17, 2001
 
 Executive Order 12003
 Relating to energy policy and conservation

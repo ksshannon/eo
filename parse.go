@@ -13,6 +13,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -65,7 +66,7 @@ func parseSigned(s string) (time.Time, error) {
 
 const delimiter = "Executive Order"
 
-var delimitRE = regexp.MustCompile(`^Executive Order [0-9]+(-[A-Z])?$`)
+var delimitRE = regexp.MustCompile(`^Executive Order [0-9]+(-?[A-Z])?$`)
 
 func ParseExecOrders(r io.Reader) []ExecOrder {
 	var e ExecOrder
@@ -80,8 +81,16 @@ func ParseExecOrders(r io.Reader) []ExecOrder {
 		}
 		if delimitRE.MatchString(text) {
 			eos = append(eos, e)
-			n := eoMatch.FindString(text)
-			e.Number = n
+			// Add support for the suffix extraction
+			matches := eoMatch.FindStringSubmatch(text)
+			e.Number, err = strconv.Atoi(matches[1])
+			if err != nil {
+				log.Print(err)
+			}
+			e.Suffix = matches[2]
+			if e.Suffix != "" && e.Suffix[0] == '-' {
+				e.Suffix = e.Suffix[1:]
+			}
 			e.Title = ""
 			e.Notes = make(map[string]string)
 			continue

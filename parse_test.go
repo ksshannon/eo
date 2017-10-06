@@ -10,7 +10,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -23,6 +22,50 @@ func TestParseInvalidYear(t *testing.T) {
 	}
 }
 
+func TestEODelimitMatch(t *testing.T) {
+	tests := []struct {
+		s string
+		b bool
+	}{
+		{"Executive Order 1234", true},
+		{"Executive Order 1234A", true},
+		{"Executive Order 1234B", true},
+		{"Executive Order 1234-A", true},
+		{"Executive Order 1234AA", false},
+		{"Executive Order 1234-AA", false},
+	}
+	for _, test := range tests {
+		if delimitRE.MatchString(test.s) != test.b {
+			t.Errorf("invalid match: %s returned %t", test.s, test.b)
+		}
+	}
+}
+
+func TestEONumberSubmatch(t *testing.T) {
+	t.Skip("write me")
+	/*
+		tests := []struct {
+			s string
+			m []string
+		}{
+			{"1234", []string{"1234", "", ""}},
+			{"1234A", []string{"1234A", "1234", "A"}},
+			{"1234B", []string{"1234B", "1234", "B"}},
+			{"1234-A", []string{"1234", "1234", "-A"}},
+			{"1234AA", []string{"", "", ""}},
+			{"1234-AA", []string{"", "", ""}},
+		}
+		for _, test := range tests {
+			m := delimitRE.SubMatchString(test.s)
+			for i, mm := range m {
+				if mm != test.m[i] {
+					t.Errorf("invalid match: %s returned %t", mm, test.m[i])
+				}
+			}
+		}
+	*/
+}
+
 func TestParse1937(t *testing.T) {
 	eos := ParseExecOrdersIn(1937)
 	if eos == nil {
@@ -30,8 +73,8 @@ func TestParse1937(t *testing.T) {
 	}
 	// Check the data in the first order
 	e := eos[0]
-	if e.Number != "7532" {
-		t.Errorf("incorrect number: %s", e.Number)
+	if e.Number != 7532 {
+		t.Errorf("incorrect number: %d", e.Number)
 	}
 	if strings.Index(e.Title, "Shinnecock") < 0 {
 		t.Errorf("incorrect title: %s", e.Title)
@@ -55,7 +98,7 @@ func TestParse1983(t *testing.T) {
 	// Find 12407, it should be revoke 12314
 	found := false
 	for _, e := range eos {
-		if e.Number == "12407" {
+		if e.Number == 12407 {
 			found = true
 			if strings.Index(e.Notes["Revokes"], "12314") < 0 {
 				t.Errorf("invalid revokes note: %s", e.Notes["Revokes"])
@@ -76,7 +119,7 @@ func TestMultiRevoke(t *testing.T) {
 	found := false
 	// Find 12148, revokes many orders, including 10242
 	for _, e := range eos {
-		if e.Number == "12148" {
+		if e.Number == 12148 {
 			revokes := e.Revokes()
 			for _, n := range revokes {
 				if n == 10242 {
@@ -99,20 +142,20 @@ func TestParseAll(t *testing.T) {
 	}
 	var invalid int
 	for i, e := range allOrders {
-		this, err := strconv.Atoi(e.Number)
+		this := e.Number
 		if err == nil && i > 0 {
-			last, err := strconv.Atoi(allOrders[i-1].Number)
+			last := allOrders[i-1].Number
 			if err == nil {
-				if this-last != 1 {
+				if this-last != 1 && e.Suffix == "" {
 					t.Log(last, this)
 					invalid++
 				}
 			}
 		}
 	}
-	// grep -E '^Executive Order [0-9]+(-[A-Z])?$' data/*.txt | wc -l
+	// grep -E '^Executive Order [0-9]+(-?[A-Z])?$' data/*.txt | wc -l
 	// reports 6275.
-	const orderCount = 6279
+	const orderCount = 6280
 	if len(allOrders) != orderCount {
 		t.Errorf("parsed %d orders, expected %d", len(allOrders), orderCount)
 	}
@@ -132,7 +175,7 @@ func TestShortEONumber(t *testing.T) {
 	found := false
 	// Find 12553, revokes many orders, including a short EO number, 723
 	for _, e := range eos {
-		if e.Number == "12553" {
+		if e.Number == 12553 {
 			revokes := e.Revokes()
 			for _, n := range revokes {
 				if n == 723 {
@@ -200,7 +243,7 @@ func TestAlphaEO(t *testing.T) {
 	}
 	found := false
 	for _, e := range eos {
-		if e.Number == "7677-A" {
+		if e.Number == 7677 && e.Suffix == "A" {
 			found = true
 			if w, _ := e.Whom(); w != "Franklin D. Roosevelt" {
 				t.Errorf("Whom failed on AlphaEO: %s", w)
@@ -218,7 +261,7 @@ func Test9379(t *testing.T) {
 	if eos == nil {
 		t.Fatal("failed to parse")
 	}
-	const n = "9379"
+	const n = 9379
 	var found bool
 	for _, e := range eos {
 		if e.Number == n {
@@ -323,7 +366,7 @@ func TestMisses(t *testing.T) {
 	for _, test := range tests {
 		found := false
 		for _, e := range eos {
-			if e.Number == fmt.Sprintf("%d", test) {
+			if e.Number == test {
 				found = true
 				break
 			}
@@ -351,7 +394,7 @@ func TestRevokeString(t *testing.T) {
 	var found bool
 	var eo ExecOrder
 	for _, e := range eos {
-		if e.Number == "8346" {
+		if e.Number == 8346 {
 			eo = e
 			found = true
 			break
@@ -380,15 +423,14 @@ func TestRevokeString(t *testing.T) {
 		t.Error("length of Revokes() and RevokeStrings() mis-match")
 	}
 }
-
 func TestSigned(t *testing.T) {
 	tests := []struct {
-		n string
+		n int
 		s time.Time
 	}{
-		{"7726", time.Date(1937, 10, 12, 0, 0, 0, 0, time.UTC)},
+		{7726, time.Date(1937, 10, 12, 0, 0, 0, 0, time.UTC)},
 		// Two 'Signed' keys
-		{"7729", time.Date(1937, 10, 16, 0, 0, 0, 0, time.UTC)},
+		{7729, time.Date(1937, 10, 16, 0, 0, 0, 0, time.UTC)},
 	}
 	eos := ParseExecOrdersIn(1937)
 	for _, test := range tests {
@@ -398,8 +440,4 @@ func TestSigned(t *testing.T) {
 			}
 		}
 	}
-}
-
-func TestFDR7729(t *testing.T) {
-
 }

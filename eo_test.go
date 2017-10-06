@@ -5,7 +5,6 @@
 package eo
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -29,18 +28,10 @@ func TestWhom(t *testing.T) {
 		if w != test.name {
 			t.Errorf("failed whom: %+v (got %s)", test, w)
 		}
-		e.Number = fmt.Sprintf("%d", test.i)
+		e.Number = test.i
 		w, _ = e.Whom()
 		if w != test.name {
 			t.Errorf("failed Whom: %+v (got %s)", test, w)
 		}
-	}
-}
-
-func TestWhomAlpha(t *testing.T) {
-	e := ExecOrder{Number: "6071-A"}
-	w, _ := e.Whom()
-	if w != "Franklin D. Roosevelt" {
-		t.Errorf("whom failed with alpha")
 	}
 }

@@ -5,7 +5,6 @@
 package eo
 
 import (
-	"strconv"
 	"testing"
 )
 
@@ -16,10 +15,10 @@ func TestFetch(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	n, _ := strconv.Atoi(eos[0].Number)
+	n := eos[0].Number
 
 	for _, eo := range eos[1:] {
-		eon, _ := strconv.Atoi(eo.Number)
+		eon := eo.Number
 		if eon <= n {
 			t.Errorf("%s > previous (%d)", eo.Number, n)
 			t.Logf("%+v", eo)
@@ -41,7 +40,7 @@ func TestFetchAllOrders(t *testing.T) {
 	// 13103
 	var golden ExecOrder
 	for _, eo := range oldEO {
-		if eo.Number == "13103" {
+		if eo.Number == 13103 {
 			golden = eo
 			break
 		}
@@ -51,7 +50,7 @@ func TestFetchAllOrders(t *testing.T) {
 		t.Error(err)
 	}
 	for _, eo := range newEO {
-		if eo.Number == "13103" && eo.Title != golden.Title {
+		if eo.Number == 13103 && eo.Title != golden.Title {
 			t.Errorf("%+v != %+v", golden, eo)
 			break
 		}

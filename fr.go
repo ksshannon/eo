@@ -109,7 +109,7 @@ func FetchCurrent() ([]ExecOrder, error) {
 			continue
 		}
 		eo.Title = res.Title
-		eo.Number = fmt.Sprintf("%d", res.Number)
+		eo.Number = res.Number
 		eo.Notes = make(map[string]string)
 		notes := strings.Split(res.Notes, "\n")
 		for _, notes := range notes {
@@ -177,7 +177,7 @@ func FetchAllOrders() ([]ExecOrder, error) {
 	var eos []ExecOrder
 	for _, r := range result.Results {
 		eo := ExecOrder{
-			Number: fmt.Sprintf("%d", r.ExecutiveOrderNumber),
+			Number: int(r.ExecutiveOrderNumber),
 			Title:  r.Title,
 			Notes:  map[string]string{},
 		}
