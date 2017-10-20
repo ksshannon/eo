@@ -379,3 +379,13 @@ func TestRevokeString(t *testing.T) {
 		t.Error("length of Revokes() and RevokeStrings() mis-match")
 	}
 }
+
+func BenchmarkParse(b *testing.B) {
+	var eos []ExecOrder
+	for i := 0; i < b.N; i++ {
+		eos = ParseExecOrdersIn(1946)
+		if eos == nil {
+			b.Fatal("no eos")
+		}
+	}
+}
