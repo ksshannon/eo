@@ -27,7 +27,20 @@ func TestFetch(t *testing.T) {
 	}
 }
 
+func TestFetchCurrent(t *testing.T) {
+	eos, err := fetchCurrentFedReg()
+	if err != nil {
+		t.Fatal(err)
+	}
+	eo := eos[0]
+	// Trump's first was 13765
+	if eo.Number != 13765 {
+		t.Errorf("fetched wrong eo: %+v", eo)
+	}
+}
+
 func TestFetchAllOrders(t *testing.T) {
+	t.Skip()
 	_, err := FetchAllOrders()
 	if err != nil {
 		t.Error(err)

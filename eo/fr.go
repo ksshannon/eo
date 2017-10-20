@@ -8,11 +8,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 var fedRegURL = url.URL{
@@ -123,6 +125,54 @@ func FetchCurrent() ([]ExecOrder, error) {
 	return eos, nil
 }
 
+var allFedRegFields = []string{
+	"abstract",
+	"action",
+	"agencies",
+	"agency_names",
+	"body_html_url",
+	"cfr_references",
+	"citation",
+	"comment_url",
+	"comments_close_on",
+	"correction_of",
+	"corrections",
+	"dates",
+	"docket_id",
+	"docket_ids",
+	"document_number",
+	"effective_on",
+	"end_page",
+	"excerpts",
+	"executive_order_notes",
+	"executive_order_number",
+	"full_text_xml_url",
+	"html_url",
+	"images",
+	"json_url",
+	"mods_url",
+	"page_length",
+	"pdf_url",
+	"president",
+	"public_inspection_pdf_url",
+	"publication_date",
+	"raw_text_url",
+	"regulation_id_number_info",
+	"regulation_id_numbers",
+	"regulations_dot_gov_info",
+	"regulations_dot_gov_url",
+	"significant",
+	"signing_date",
+	"start_page",
+	"subtype",
+	"title",
+	"toc_doc",
+	"toc_subject",
+	"topics",
+	"type",
+	"volume",
+}
+
 func FetchAllOrders() ([]ExecOrder, error) {
 	u := url.URL{
 		Scheme: "https",
@@ -130,54 +180,6 @@ func FetchAllOrders() ([]ExecOrder, error) {
 		Path:   "/api/v1/documents.json",
 	}
 	q := url.Values{}
-	// Available fields
-	//
-	// abstract
-	// action
-	// agencies
-	// agency_names
-	// body_html_url
-	// cfr_references
-	// citation
-	// comment_url
-	// comments_close_on
-	// correction_of
-	// corrections
-	// dates
-	// docket_id
-	// docket_ids
-	// document_number
-	// effective_on
-	// end_page
-	// excerpts
-	// executive_order_notes
-	// executive_order_number
-	// full_text_xml_url
-	// html_url
-	// images
-	// json_url
-	// mods_url
-	// page_length
-	// pdf_url
-	// president
-	// public_inspection_pdf_url
-	// publication_date
-	// raw_text_url
-	// regulation_id_number_info
-	// regulation_id_numbers
-	// regulations_dot_gov_info
-	// regulations_dot_gov_url
-	// significant
-	// signing_date
-	// start_page
-	// subtype
-	// title
-	// toc_doc
-	// toc_subject
-	// topics
-	// type
-	// volume
-
 	q.Add("conditions[correction]", "0")
 	q.Add("conditions[presidential_document_type_id]", "2")
 	q.Add("conditions[type]", "PRESDOCU")
@@ -199,13 +201,114 @@ func FetchAllOrders() ([]ExecOrder, error) {
 	q.Add("per_page", "1000")
 	u.RawQuery = q.Encode()
 	_ = u
-	/*
-		resp, err := http.Get(u.String())
-		if err != nil {
-			return nil, err
-		}
-		defer resp.Body.Close()
-	*/
+	resp, err := http.Get(u.String())
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	return parseFedRegJSON(resp.Body)
+}
+
+func LoadFedRegData(update bool) ([]ExecOrder, error) {
+	eos, err := readLocalFedReg()
+	if err != nil {
+		return eos, err
+	}
+	new, err := fetchFedRegAfterEO(eos[len(eos)-1].Number)
+	if err != nil {
+		return eos, err
+	}
+	eos = append(eos, new...)
+	return eos, nil
+}
+
+func fetchCurrentFedReg() ([]ExecOrder, error) {
+	u := url.URL{
+		Scheme: "https",
+		Host:   "federalregister.gov",
+		Path:   "/api/v1/documents.json",
+	}
+	q := url.Values{}
+	q.Add("conditions[correction]", "0")
+	q.Add("conditions[presidential_document_type_id]", "2")
+	q.Add("conditions[type]", "PRESDOCU")
+	q.Add("conditions[president][]", "donald-trump")
+	q.Add("fields[]", "citation")
+	q.Add("fields[]", "document_number")
+	q.Add("fields[]", "end_page")
+	q.Add("fields[]", "executive_order_notes")
+	q.Add("fields[]", "executive_order_number")
+	q.Add("fields[]", "html_url")
+	q.Add("fields[]", "pdf_url")
+	q.Add("fields[]", "publication_date")
+	q.Add("fields[]", "signing_date")
+	q.Add("fields[]", "start_page")
+	q.Add("fields[]", "title")
+	q.Add("fields[]", "full_text_xml_url")
+	q.Add("fields[]", "body_html_url")
+	q.Add("fields[]", "json_url")
+	q.Add("order", "executive_order_number")
+	q.Add("per_page", "1")
+	u.RawQuery = q.Encode()
+	resp, err := http.Get(u.String())
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	return parseFedRegJSON(resp.Body)
+}
+
+func fetchFedRegAfterEO(after int) ([]ExecOrder, error) {
+	u := url.URL{
+		Scheme: "https",
+		Host:   "federalregister.gov",
+		Path:   "/api/v1/documents.json",
+	}
+	q := url.Values{}
+	q.Add("conditions[correction]", "0")
+	q.Add("conditions[presidential_document_type_id]", "2")
+	q.Add("conditions[type]", "PRESDOCU")
+	q.Add("fields[]", "citation")
+	q.Add("fields[]", "document_number")
+	q.Add("fields[]", "end_page")
+	q.Add("fields[]", "executive_order_notes")
+	q.Add("fields[]", "executive_order_number")
+	q.Add("fields[]", "html_url")
+	q.Add("fields[]", "pdf_url")
+	q.Add("fields[]", "publication_date")
+	q.Add("fields[]", "signing_date")
+	q.Add("fields[]", "start_page")
+	q.Add("fields[]", "title")
+	q.Add("fields[]", "full_text_xml_url")
+	q.Add("fields[]", "body_html_url")
+	q.Add("fields[]", "json_url")
+	q.Add("order", "executive_order_number")
+	q.Add("per_page", "1")
+	u.RawQuery = q.Encode()
+	resp, err := http.Get(u.String())
+	if err != nil {
+		return nil, err
+	}
+	eos, err := parseFedRegJSON(resp.Body)
+	resp.Body.Close()
+	if err != nil || len(eos) < 1 {
+		return eos, err
+	}
+	n := eos[0].Number - after
+	if n < 1 {
+		return eos, nil
+	}
+	q.Set("per_page", string(n))
+	u.RawQuery = q.Encode()
+	resp, err = http.Get(u.String())
+	if err != nil {
+		return eos, err
+	}
+	defer resp.Body.Close()
+	return parseFedRegJSON(resp.Body)
+}
+
+func readLocalFedReg() ([]ExecOrder, error) {
 	glob, _ := filepath.Glob("./data/fr/*.json")
 	var buf []byte
 	for _, p := range glob {
@@ -215,9 +318,13 @@ func FetchAllOrders() ([]ExecOrder, error) {
 		}
 		buf = append(buf, b...)
 	}
+	return parseFedRegJSON(bytes.NewReader(buf))
+}
+
+func parseFedRegJSON(r io.Reader) ([]ExecOrder, error) {
 	var result fedRegResp2
 	//err = json.NewDecoder(resp.Body).Decode(&result)
-	err := json.NewDecoder(bytes.NewReader(buf)).Decode(&result)
+	err := json.NewDecoder(r).Decode(&result)
 	if err != nil {
 		return nil, err
 	}
@@ -232,6 +339,7 @@ func FetchAllOrders() ([]ExecOrder, error) {
 		if len(tokens) > 1 {
 			eo.Notes[tokens[0]] = strings.Join(tokens[1:], ":")
 		}
+		eo.Signed, _ = time.Parse("2006-01-02", eo.Notes["Signed"])
 		eos = append(eos, eo)
 	}
 	return eos, nil
