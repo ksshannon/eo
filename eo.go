@@ -5,17 +5,52 @@
 package eo
 
 import (
+	"fmt"
+	"log"
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
+
+func init() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+}
 
 // Source: https://www.archives.gov/federal-register/executive-orders
 
+type ExecOrder2 struct {
+	Number    int               `json:"executive_order_number"`
+	Suffix    string            `json:"executive_order_number_suffix"`
+	Notes     map[string]string `json:"executive_order_notes"`
+	Title     string            `json:"title"`
+	President string            `json:"president"`
+}
+
+func (eo ExecOrder2) Signed() (time.Time, error) {
+	s, ok := eo.Notes["Signed"]
+	if !ok {
+		return time.Time{}, fmt.Errorf("no signed value in notes")
+	}
+	return time.Parse("January 2, 2006", s)
+}
+
+func (eo ExecOrder2) String() string {
+	s := fmt.Sprintf("Executive Order %d%s\n", eo.Number, eo.Suffix)
+	s += eo.Title + "\n\n"
+	//TODO(kyle): order keys
+	for k, v := range eo.Notes {
+		s += "    " + fmt.Sprintf("%s: %v\n", k, v)
+	}
+	return s
+}
+
 type ExecOrder struct {
-	Number string
+	Number int
+	Suffix string
 	Title  string
 	Notes  map[string]string
+	Signed time.Time
 }
 
 var starts = []struct {
@@ -51,20 +86,12 @@ func whom(order int) (string, int) {
 	return starts[len(starts)-1].whom, i
 }
 
-var eoMatch = regexp.MustCompile(`[0-9]+(-[A-Z])?`)
+var eoMatch = regexp.MustCompile(`([0-9]+)(-?[A-Z])?`)
 var revokeMatch = regexp.MustCompile(`EO [0-9]+`)
 var numMatch = regexp.MustCompile(`[0-9]+`)
 
 func (e *ExecOrder) Whom() (string, int) {
-	m := numMatch.FindString(e.Number)
-	if m == "" {
-		return m, -1
-	}
-	n, err := strconv.Atoi(m)
-	if err != nil {
-		return "", -1
-	}
-	return whom(n)
+	return whom(e.Number)
 }
 
 func (e *ExecOrder) Revokes() []int {

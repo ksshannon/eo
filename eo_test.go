@@ -5,8 +5,8 @@
 package eo
 
 import (
-	"fmt"
 	"testing"
+	"time"
 )
 
 func TestWhom(t *testing.T) {
@@ -29,7 +29,7 @@ func TestWhom(t *testing.T) {
 		if w != test.name {
 			t.Errorf("failed whom: %+v (got %s)", test, w)
 		}
-		e.Number = fmt.Sprintf("%d", test.i)
+		e.Number = test.i
 		w, _ = e.Whom()
 		if w != test.name {
 			t.Errorf("failed Whom: %+v (got %s)", test, w)
@@ -37,10 +37,32 @@ func TestWhom(t *testing.T) {
 	}
 }
 
-func TestWhomAlpha(t *testing.T) {
-	e := ExecOrder{Number: "6071-A"}
-	w, _ := e.Whom()
-	if w != "Franklin D. Roosevelt" {
-		t.Errorf("whom failed with alpha")
+func TestSigned2(t *testing.T) {
+	eo := ExecOrder2{
+		Notes: map[string]string{
+			"Signed": "January 20, 1944",
+		},
 	}
+	exp := time.Date(1944, 1, 20, 0, 0, 0, 0, time.UTC)
+	got, err := eo.Signed()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got != exp {
+		t.Errorf("invalid signed, got: %s, want: %s", got, exp)
+	}
+}
+
+func TestString(t *testing.T) {
+	eo := ExecOrder2{
+		Number: 9414,
+		Title:  "Regulations Relating to Annual and Sick Leave of Government Employees",
+		Notes: map[string]string{
+			"Signed": "January 13, 1944",
+			"Federal Register page and date": "9 FR 623, January 18, 1944",
+			"Supersedes":                     "EO 8384, March 29, 1940; EO 8385, March 29, 1940; EO 9307, March 3, 1943; EO 9371, August 24, 1943",
+			"Note":                           "The authority of this Executive order was repealed by the Annual and Sick Leave Act of 1951.",
+		},
+	}
+	_ = eo
 }

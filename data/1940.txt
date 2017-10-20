@@ -1916,7 +1916,10 @@ Amendment of Executive Order No. 8502 of August 3, 1940, Prescribing Regulations
 Executive Order 8596
 Modifying Executive Order No. 3825 of April 14, 1923, and Setting Apart Certain Lands for Aviation Field Purposes; Alaska
 
-    Signed: 5 FR 4558, November 18, 194November 20, 1940
+    # Fixing joined line.  Looks like signed and page got garbled
+    # Old: Signed: 5 FR 4558, November 18, 194November 20, 1940
+    Signed: November 18, 1940
+    Federal Register page and date: 5 FR 4558, November 20, 1940
     Amends: EO 3825, April 14, 1923
     Revoked by: Public Land Order 19, August 4, 1942 (12 FR 494) (in part); Public Land Order 3751, July 26, 1965 (30 FR 9541) (in part)
 

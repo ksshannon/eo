@@ -254,7 +254,9 @@ Amendment of Executive Order No. 10152, Prescribing Regulations Relating to the 
 Executive Order 10619
 Inspection of Individual Income Tax Returns by the Department of Health, Education, and Welfare
 
-    Signed: June 29,1955
+    # Adding a space for consistent formatting
+    # Old: Signed: June 29,1955
+    Signed: June 29, 1955
     Federal Register page and date: 20 FR 4673, July 1, 1955
 
 Executive Order 10620

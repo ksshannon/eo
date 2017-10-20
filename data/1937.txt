@@ -1376,7 +1376,9 @@ Executive Order 7729
 Amending the Instructions to Diplomatic Officers and the Consular Regulations
 
     Signed: October 16, 1937
-    Signed: 2 FR 2601, October 20 1937
+    # This appears to be a mistake in the original data, fixing here.
+    # Old: Signed: 2 FR 2601, October 20 1937
+    Federal Register page and date: 2 FR 2601, October 20 1937
     Amended by: EO 7826, February 28, 1938
     Revoked by: EO 9521, February 13, 1945
 

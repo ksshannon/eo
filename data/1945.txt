@@ -1120,7 +1120,9 @@ Extension of Trust Periods on Indian Lands Expiring During Calendar Year 1946
 Executive Order 9660
 Conferring Certain Authority Upon the Chief of Counsel in the Preparation and Prosecution of Charges of War Crimes Against Major Leaders of Japan and Their Principal Agents and Accessories
 
-    Signed: November 29. 1945
+    # Fixing punctuation, '.' -> ','
+    # Old: Signed: November 29. 1945
+    Signed: November 29, 1945
     Federal Register page and date: 10 FR 14591, November 30, 1945
 
 Executive Order 9661

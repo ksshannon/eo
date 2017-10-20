@@ -351,7 +351,9 @@ Amending the Selective Service regulations
 Executive Order 11120
 Amendment of Executive Order No. 10152, relating to incentive pay for hazardous duty, Executive Order No. 10168, relating to pay for sea duty and duty at certain places, and Executive Order No. 10204, relating to basic allowances for quarters
 
-    Signed: Oct 2, 1963
+    # Fixing date for consistent formatting
+    # Old: Signed: Oct 2, 1963
+    Signed: October 2, 1963
     Federal Register page and date: 28 FR 10631; October 3, 1963
     Amends: EO 10152, August 17, 1950; EO 10168, October 11, 1950; EO 10204, January 15, 1951
     Revoked by: EO 11157, June 22, 1964

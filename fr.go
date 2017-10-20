@@ -109,7 +109,7 @@ func FetchCurrent() ([]ExecOrder, error) {
 			continue
 		}
 		eo.Title = res.Title
-		eo.Number = fmt.Sprintf("%d", res.Number)
+		eo.Number = res.Number
 		eo.Notes = make(map[string]string)
 		notes := strings.Split(res.Notes, "\n")
 		for _, notes := range notes {
@@ -130,6 +130,54 @@ func FetchAllOrders() ([]ExecOrder, error) {
 		Path:   "/api/v1/documents.json",
 	}
 	q := url.Values{}
+	// Available fields
+	//
+	// abstract
+	// action
+	// agencies
+	// agency_names
+	// body_html_url
+	// cfr_references
+	// citation
+	// comment_url
+	// comments_close_on
+	// correction_of
+	// corrections
+	// dates
+	// docket_id
+	// docket_ids
+	// document_number
+	// effective_on
+	// end_page
+	// excerpts
+	// executive_order_notes
+	// executive_order_number
+	// full_text_xml_url
+	// html_url
+	// images
+	// json_url
+	// mods_url
+	// page_length
+	// pdf_url
+	// president
+	// public_inspection_pdf_url
+	// publication_date
+	// raw_text_url
+	// regulation_id_number_info
+	// regulation_id_numbers
+	// regulations_dot_gov_info
+	// regulations_dot_gov_url
+	// significant
+	// signing_date
+	// start_page
+	// subtype
+	// title
+	// toc_doc
+	// toc_subject
+	// topics
+	// type
+	// volume
+
 	q.Add("conditions[correction]", "0")
 	q.Add("conditions[presidential_document_type_id]", "2")
 	q.Add("conditions[type]", "PRESDOCU")
@@ -158,11 +206,10 @@ func FetchAllOrders() ([]ExecOrder, error) {
 		}
 		defer resp.Body.Close()
 	*/
-	pres := []string{"clinton", "bushw", "obama", "trump"}
+	glob, _ := filepath.Glob("./data/fr/*.json")
 	var buf []byte
-	for _, p := range pres {
-		path := filepath.Join("data", "fr", p) + ".json"
-		b, err := ioutil.ReadFile(path)
+	for _, p := range glob {
+		b, err := ioutil.ReadFile(p)
 		if err != nil {
 			return nil, err
 		}
@@ -177,7 +224,7 @@ func FetchAllOrders() ([]ExecOrder, error) {
 	var eos []ExecOrder
 	for _, r := range result.Results {
 		eo := ExecOrder{
-			Number: fmt.Sprintf("%d", r.ExecutiveOrderNumber),
+			Number: int(r.ExecutiveOrderNumber),
 			Title:  r.Title,
 			Notes:  map[string]string{},
 		}

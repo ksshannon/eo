@@ -230,7 +230,9 @@ Designating the International Finance Corporation as a Public International Orga
 Executive Order 10681
 Amendment of Executive Order No. 10152, Prescribing Regulations Relating to Incentive Pay for the Performance of Hazardous Duty
 
-    Signed: October 22, 19656
+    # Fixing invalid year.
+    # Old: Signed: October 22, 19656
+    Signed: October 22, 1956
     Federal Register page and date: 21 FR 8129, October 24, 1956
     Amends: EO 10152, August 17, 1950
     Revoked by: EO 11157, June 22, 1964
