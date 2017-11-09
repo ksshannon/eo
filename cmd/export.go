@@ -6,51 +6,64 @@ package main
 
 import (
 	"encoding/csv"
+	"encoding/json"
+	"flag"
 	"fmt"
+	"log"
 	"os"
 
+	"github.com/go-yaml/yaml"
 	"github.com/ksshannon/mc/eo"
 )
 
 func main() {
+	format := flag.String("f", "json", "format(csv,json,yaml)")
+	pretty := flag.Bool("p", false, "pretty print")
+	flag.Parse()
 	fout := os.Stdout
-	cout := csv.NewWriter(fout)
-	cout.Write([]string{
-		"eo",
-		"signed",
-		"title",
-		"president",
-		"revokes",
-		"revokee",
-		"revokee_id",
-		"full_revoke_comment",
-		"partial_revoke_comment",
-	})
-
 	eos, err := eo.ParseAllOrders("./data")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
-	var revokeeEO eo.ExecOrder
-	for _, e := range eos {
-		w, _ := e.Whom()
-		rs := e.RevokeStrings(true)
-		for _, revoke := range rs {
-			revokeeEO.Number = revoke
-			revokee, rid := revokeeEO.Whom()
+	var b []byte
+
+	switch *format {
+	case "csv":
+		cout := csv.NewWriter(fout)
+		cout.Write([]string{
+			"number",
+			"suffix",
+			"notes",
+			"title",
+			"president",
+			"signed",
+		})
+		for _, eo := range eos {
+			notes := ""
+			for k, v := range eo.Notes {
+				notes += k + ":" + v + ";"
+			}
 			cout.Write([]string{
-				e.Number,
-				e.Notes["Signed"],
-				e.Title,
-				w,
-				revoke,
-				revokee,
-				fmt.Sprintf("%d", rid),
-				e.Notes["Revokes"],
-				e.Notes["Revokes in part"],
+				fmt.Sprintf("%d", eo.Number),
+				eo.Suffix,
+				notes,
+				eo.Title,
+				eo.President,
+				eo.Signed.Format("01-02-2006"),
 			})
 		}
+	case "json":
+		if *pretty {
+			b, err = json.MarshalIndent(eos, "", "  ")
+		} else {
+			b, err = json.Marshal(eos)
+		}
+	case "yaml":
+		b, err = yaml.Marshal(eos)
 	}
-	cout.Flush()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fout.Write(b)
 }
