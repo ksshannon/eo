@@ -1,5 +1,5 @@
-// Copyright 2016 Kyle Shannon.  All rights reserved.
-// Use of this source code is governed by a BSD-style
+// Copyright 2016 Kyle Shannon.  All rights reserved.  Use of this source code
+// is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
 package eo
@@ -214,7 +214,7 @@ func LoadFedRegData(update bool) ([]ExecOrder, error) {
 	if err != nil {
 		return eos, err
 	}
-	new, err := fetchFedRegAfterEO(eos[len(eos)-1].Number)
+	new, err := FetchFedRegAfterEO(eos[len(eos)-1].Number)
 	if err != nil {
 		return eos, err
 	}
@@ -258,7 +258,7 @@ func fetchCurrentFedReg() ([]ExecOrder, error) {
 	return parseFedRegJSON(resp.Body)
 }
 
-func fetchFedRegAfterEO(after int) ([]ExecOrder, error) {
+func FetchFedRegAfterEO(after int) ([]ExecOrder, error) {
 	u := url.URL{
 		Scheme: "https",
 		Host:   "federalregister.gov",
@@ -323,23 +323,24 @@ func readLocalFedReg() ([]ExecOrder, error) {
 
 func parseFedRegJSON(r io.Reader) ([]ExecOrder, error) {
 	var result fedRegResp2
-	//err = json.NewDecoder(resp.Body).Decode(&result)
 	err := json.NewDecoder(r).Decode(&result)
 	if err != nil {
 		return nil, err
 	}
 	var eos []ExecOrder
 	for _, r := range result.Results {
+		w, _ := whom(int(r.ExecutiveOrderNumber))
 		eo := ExecOrder{
-			Number: int(r.ExecutiveOrderNumber),
-			Title:  r.Title,
-			Notes:  map[string]string{},
+			Number:    int(r.ExecutiveOrderNumber),
+			Title:     r.Title,
+			President: w,
+			Notes:     map[string]string{},
 		}
 		tokens := strings.Split(r.ExecutiveOrderNotes, ":")
 		if len(tokens) > 1 {
 			eo.Notes[tokens[0]] = strings.Join(tokens[1:], ":")
 		}
-		eo.Signed, _ = time.Parse("2006-01-02", eo.Notes["Signed"])
+		eo.Signed, err = time.Parse("2006-01-02", r.SigningDate)
 		eos = append(eos, eo)
 	}
 	return eos, nil

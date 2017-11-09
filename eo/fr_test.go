@@ -77,24 +77,33 @@ func TestOldAgainstNew(t *testing.T) {
 	if old == nil {
 		t.Fatal("no orders")
 	}
-	eos, err := fetchFedRegAfterEO(eo - 1)
+	eos, err := FetchFedRegAfterEO(eo - 1)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	var a, b ExecOrder
+	var found bool
 	for _, e := range old {
 		if e.Number == eo {
 			a = e
+			found = true
 			break
 		}
+	}
+	if !found {
+		t.Error("didn't find a")
 	}
 
 	for _, e := range eos {
 		if e.Number == eo {
 			b = e
+			found = true
 			break
 		}
+	}
+	if !found {
+		t.Error("didn't find b")
 	}
 	// Some titles are title cased in the new data, but not the old
 	if a.Number != b.Number || strings.ToLower(a.Title) != strings.ToLower(b.Title) {

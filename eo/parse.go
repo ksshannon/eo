@@ -80,6 +80,7 @@ func ParseExecOrders(r io.Reader) []ExecOrder {
 			continue
 		}
 		if delimitRE.MatchString(text) {
+			e.President, _ = e.Whom()
 			eos = append(eos, e)
 			// Add support for the suffix extraction
 			matches := eoMatch.FindStringSubmatch(text)
@@ -110,7 +111,6 @@ func ParseExecOrders(r io.Reader) []ExecOrder {
 			}
 		}
 	}
-	e.President, _ = e.Whom()
 	eos = append(eos, e)
 	if len(eos) < 1 {
 		return nil

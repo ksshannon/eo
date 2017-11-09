@@ -60,7 +60,7 @@ var starts = []struct {
 }
 
 func whom(order int) (string, int) {
-	if order < 5075 {
+	if order < starts[0].start {
 		return "Unknown", -1
 	}
 	var i int

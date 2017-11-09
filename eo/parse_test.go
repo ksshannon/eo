@@ -87,6 +87,9 @@ func TestParse1937(t *testing.T) {
 	} else if strings.Index(n, "Public") < 0 {
 		t.Errorf("invalid notes: %+v", e.Notes)
 	}
+	if e.President != "Franklin D. Roosevelt" {
+		t.Errorf("invalid president: %s", e.President)
+	}
 }
 
 func TestParse1983(t *testing.T) {

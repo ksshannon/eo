@@ -25,6 +25,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	fr, err := eo.FetchFedRegAfterEO(eos[len(eos)-1].Number)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	eos = append(eos, fr...)
 
 	var b []byte
 
