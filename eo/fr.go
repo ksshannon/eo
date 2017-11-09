@@ -283,7 +283,7 @@ func fetchFedRegAfterEO(after int) ([]ExecOrder, error) {
 	q.Add("fields[]", "body_html_url")
 	q.Add("fields[]", "json_url")
 	q.Add("order", "executive_order_number")
-	q.Add("per_page", "1")
+	q.Add("per_page", "1000")
 	u.RawQuery = q.Encode()
 	resp, err := http.Get(u.String())
 	if err != nil {

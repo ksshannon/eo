@@ -5,6 +5,7 @@
 package eo
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -67,5 +68,36 @@ func TestFetchAllOrders(t *testing.T) {
 			t.Errorf("%+v != %+v", golden, eo)
 			break
 		}
+	}
+}
+
+func TestOldAgainstNew(t *testing.T) {
+	eo := starts[len(starts)-1].start
+	old := ParseExecOrdersIn(2017)
+	if old == nil {
+		t.Fatal("no orders")
+	}
+	eos, err := fetchFedRegAfterEO(eo - 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var a, b ExecOrder
+	for _, e := range old {
+		if e.Number == eo {
+			a = e
+			break
+		}
+	}
+
+	for _, e := range eos {
+		if e.Number == eo {
+			b = e
+			break
+		}
+	}
+	// Some titles are title cased in the new data, but not the old
+	if a.Number != b.Number || strings.ToLower(a.Title) != strings.ToLower(b.Title) {
+		t.Errorf("invalid match: %+v != %+v", a, b)
 	}
 }
