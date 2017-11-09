@@ -6,7 +6,6 @@ package eo
 
 import (
 	"testing"
-	"time"
 )
 
 func TestWhom(t *testing.T) {
@@ -37,24 +36,8 @@ func TestWhom(t *testing.T) {
 	}
 }
 
-func TestSigned2(t *testing.T) {
-	eo := ExecOrder2{
-		Notes: map[string]string{
-			"Signed": "January 20, 1944",
-		},
-	}
-	exp := time.Date(1944, 1, 20, 0, 0, 0, 0, time.UTC)
-	got, err := eo.Signed()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if got != exp {
-		t.Errorf("invalid signed, got: %s, want: %s", got, exp)
-	}
-}
-
 func TestString(t *testing.T) {
-	eo := ExecOrder2{
+	eo := ExecOrder{
 		Number: 9414,
 		Title:  "Regulations Relating to Annual and Sick Leave of Government Employees",
 		Notes: map[string]string{

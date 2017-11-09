@@ -19,23 +19,16 @@ func init() {
 
 // Source: https://www.archives.gov/federal-register/executive-orders
 
-type ExecOrder2 struct {
-	Number    int               `json:"executive_order_number"`
-	Suffix    string            `json:"executive_order_number_suffix"`
-	Notes     map[string]string `json:"executive_order_notes"`
-	Title     string            `json:"title"`
-	President string            `json:"president"`
+type ExecOrder struct {
+	Number    int               `json:"number",yaml:"number"`
+	Suffix    string            `json:"suffix",yaml:"suffix"`
+	Notes     map[string]string `json:"notes",yaml:"notes"`
+	Title     string            `json:"title",yaml:"title"`
+	President string            `json:"president",yaml:"president"`
+	Signed    time.Time         `json:"signed",yaml:"signed"`
 }
 
-func (eo ExecOrder2) Signed() (time.Time, error) {
-	s, ok := eo.Notes["Signed"]
-	if !ok {
-		return time.Time{}, fmt.Errorf("no signed value in notes")
-	}
-	return time.Parse("January 2, 2006", s)
-}
-
-func (eo ExecOrder2) String() string {
+func (eo ExecOrder) String() string {
 	s := fmt.Sprintf("Executive Order %d%s\n", eo.Number, eo.Suffix)
 	s += eo.Title + "\n\n"
 	//TODO(kyle): order keys
@@ -45,18 +38,11 @@ func (eo ExecOrder2) String() string {
 	return s
 }
 
-type ExecOrder struct {
-	Number int
-	Suffix string
-	Title  string
-	Notes  map[string]string
-	Signed time.Time
-}
-
 var starts = []struct {
 	whom  string
 	start int
 }{
+	{"Herbert Hoover", 5075}, // No actual data for HH, just the EO #
 	{"Franklin D. Roosevelt", 6071},
 	{"Harry S. Truman", 9538},
 	{"Dwight D. Eisenhower", 10432},
@@ -74,7 +60,7 @@ var starts = []struct {
 }
 
 func whom(order int) (string, int) {
-	if order < 6071 {
+	if order < 5075 {
 		return "Unknown", -1
 	}
 	var i int

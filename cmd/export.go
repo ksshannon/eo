@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ksshannon/eo"
+	"github.com/ksshannon/mc/eo"
 )
 
 func main() {
