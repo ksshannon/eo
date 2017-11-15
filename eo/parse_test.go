@@ -446,6 +446,16 @@ func TestSigned(t *testing.T) {
 	}
 }
 
+func TestWeb(t *testing.T) {
+	eos, err := parseWeb()
+	if err != nil {
+		t.Error(err)
+	}
+	for _, eo := range eos {
+		fmt.Println(eo)
+	}
+}
+
 func BenchmarkParse(b *testing.B) {
 	var eos []ExecOrder
 	for i := 0; i < b.N; i++ {

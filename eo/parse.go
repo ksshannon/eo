@@ -6,16 +6,21 @@ package eo
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
+	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
+
+	"golang.org/x/net/html"
 )
 
 func ParseExecOrdersIn(year int) []ExecOrder {
@@ -116,4 +121,83 @@ func ParseExecOrders(r io.Reader) []ExecOrder {
 		return nil
 	}
 	return eos[1:]
+}
+
+var archiveURL = url.URL{
+	Scheme: "https",
+	Host:   "www.archives.gov",
+	Path:   "/federal-register/executive-orders/{{YEAR}}-{{WHOM}}.html",
+}
+
+var archiveResolv = []struct {
+	year int
+	name string
+}{
+	{1933, "roosevelt"},
+	//{2009, "obama"},
+}
+
+// The Executive Orders in the web pages appear like:
+//<p><a name="13490"></a> <strong><a class="pdfImage" href="http://www.gpo.gov/fdsys/pkg/FR-2009-01-26/pdf/E9-1719.pdf">Executive Order 13490</a></strong><br />
+//  Ethics Commitments by Executive Branch Personnel</p>
+//
+//<ul>
+//  <li>Signed: January 21, 2009</li>
+//  <li>Federal Register page and date: 74 FR 4673, January 26, 2009</li>
+//  <li>Superseded by: <a href="/federal-register/executive-orders/2017-trump#13770">EO 13770</a>, January 28, 2017</li>
+//</ul>
+//
+//<hr />
+//
+// The anchor holds the EO number It appears we can grab it from the name
+// attribute.
+//
+func parseWeb() ([]ExecOrder, error) {
+	var eos []ExecOrder
+	for _, ar := range archiveResolv {
+		u := archiveURL
+		u.Path = strings.Replace(u.Path, "{{YEAR}}", strconv.Itoa(ar.year), 1)
+		u.Path = strings.Replace(u.Path, "{{WHOM}}", ar.name, 1)
+		resp, err := http.Get(u.String())
+		if err != nil {
+			return nil, err
+		}
+		defer resp.Body.Close()
+
+		t := html.NewTokenizer(resp.Body)
+		if t == nil {
+			return nil, io.EOF
+		}
+		var eo ExecOrder
+		for tkn := t.Next(); tkn != html.ErrorToken; tkn = t.Next() {
+			if tkn != html.TextToken {
+				continue
+			}
+			text := string(bytes.TrimSpace(t.Text()))
+			// This is the title of the EO
+			if delimitRE.MatchString(text) {
+				eo.Notes = map[string]string{}
+				eo.Number, err = strconv.Atoi(strings.Fields(text)[2])
+				if err != nil {
+					return nil, err
+				}
+				t.Next()
+				eo.Title = string(t.Text())
+				tkn = t.Next()
+				text = string(t.Text())
+				eo.Notes = map[string]string{}
+				for tkn != html.ErrorToken && !delimitRE.MatchString(text) {
+					fmt.Println("XXX", text)
+					k := strings.Split(text, ":")
+					if len(k) == 2 {
+						eo.Notes[k[0]] = k[1]
+					}
+					tkn = t.Next()
+					text = string(t.Text())
+				}
+				eos = append(eos, eo)
+			}
+		}
+	}
+	return eos, nil
 }
