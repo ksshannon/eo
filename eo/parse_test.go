@@ -226,7 +226,7 @@ func TestRevokesInPart(t *testing.T) {
 		for _, e := range eos {
 			if _, hasInPart := e.Notes["Revokes in part"]; hasInPart == true {
 				if strings.Index("in part", strings.ToLower(e.Notes["Revokes"])) >= 0 {
-					t.Logf("file: %s eo: %s has revokes(in part): %s and revokes: %s",
+					t.Logf("file: %s eo: %d has revokes(in part): %s and revokes: %s",
 						fname.Name(), e.Number, e.Notes["Revokes"], e.Notes["Revokes in part"])
 					conflict++
 				}

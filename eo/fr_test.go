@@ -21,7 +21,7 @@ func TestFetch(t *testing.T) {
 	for _, eo := range eos[1:] {
 		eon := eo.Number
 		if eon <= n {
-			t.Errorf("%s > previous (%d)", eo.Number, n)
+			t.Errorf("%d > previous (%d)", eo.Number, n)
 			t.Logf("%+v", eo)
 		}
 		n = eon
