@@ -62,24 +62,6 @@ var starts = []struct {
 	{"Donald J. Trump", 13758},
 }
 
-var ordered = []string{
-	"Herbert Hoover",
-	"Franklin D. Roosevelt",
-	"Harry S. Truman",
-	"Dwight D. Eisenhower",
-	"John F. Kennedy",
-	"Lyndon B. Johnson",
-	"Richard Nixon",
-	"Gerald R. Ford",
-	"Jimmy Carter",
-	"Ronald Reagan",
-	"George H. W. Bush",
-	"Bill Clinton",
-	"George W. Bush",
-	"Barack Obama",
-	"Donald J. Trump",
-}
-
 func whom(order int) (string, int) {
 	if order < starts[0].start {
 		return "Unknown", -1

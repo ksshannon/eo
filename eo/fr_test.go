@@ -4,11 +4,22 @@
 
 package eo
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
+
+const updateTestData = false
 
 func TestReadFRData(t *testing.T) {
-	_, err := ParseFedRegData(false)
+	eos, err := ParseFedRegData(updateTestData)
 	if err != nil {
 		t.Fatal(err)
+	}
+	n := 13814
+	for _, eo := range eos {
+		if eo.Number == n {
+			fmt.Println(eo)
+		}
 	}
 }

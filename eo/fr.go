@@ -100,16 +100,20 @@ func readLocalFedReg() ([]ExecOrder, error) {
 		Obama,
 		Trump,
 	}
-	var buf []byte
+	var eos []ExecOrder
 	for _, p := range pres {
 		path := filepath.Join(".", "data", "fr", p+".json")
 		b, err := ioutil.ReadFile(path)
 		if err != nil {
 			return nil, err
 		}
-		buf = append(buf, b...)
+		e, err := parseFedRegJSON(bytes.NewReader(b))
+		if err != nil {
+			return nil, err
+		}
+		eos = append(eos, e...)
 	}
-	return parseFedRegJSON(bytes.NewReader(buf))
+	return eos, nil
 }
 
 func parseFedRegJSON(r io.Reader) ([]ExecOrder, error) {
