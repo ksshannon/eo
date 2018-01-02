@@ -74,7 +74,13 @@ func parseSigned(s string) (time.Time, error) {
 	return time.Parse("January 2, 2006", s)
 }
 
-const delimiter = "Executive Order"
+const (
+	delimiter = "Executive Order"
+
+	// The federalregister.gov data starts at this eo number, don't parse past
+	// this.
+	firstFR = 12893
+)
 
 var delimitRE = regexp.MustCompile(`^Executive Order [0-9]+(-?[A-Z])?$`)
 
@@ -97,6 +103,9 @@ func ParseExecOrders(r io.Reader) []ExecOrder {
 			e.Number, err = strconv.Atoi(matches[1])
 			if err != nil {
 				log.Print(err)
+			}
+			if e.Number >= firstFR {
+				break
 			}
 			e.Suffix = matches[2]
 			if e.Suffix != "" && e.Suffix[0] == '-' {

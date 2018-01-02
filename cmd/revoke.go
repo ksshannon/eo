@@ -6,10 +6,11 @@ package main
 
 import (
 	"encoding/csv"
+	"flag"
 	"fmt"
 	"os"
 
-	"github.com/ksshannon/eo"
+	"github.com/ksshannon/mc/eo"
 )
 
 type revokeCounts struct {
@@ -19,6 +20,7 @@ type revokeCounts struct {
 }
 
 func main() {
+	update := flag.Bool("u", false, "update the local json data before running")
 	fout := os.Stdout
 	cout := csv.NewWriter(fout)
 	cout.Write([]string{
@@ -33,6 +35,14 @@ func main() {
 		panic(err)
 	}
 
+	freos, err := eo.ParseFedRegData(*update)
+
+	if err != nil {
+		panic(err)
+	}
+
+	eos = append(eos, freos...)
+
 	m := make(map[string]revokeCounts)
 
 	for _, e := range eos {
@@ -46,14 +56,33 @@ func main() {
 		who.revoker += len(revoked)
 		m[w] = who
 		for _, r := range revoked {
-			eo := eo.ExecOrder{Number: fmt.Sprintf("%d", r)}
+			eo := eo.ExecOrder{Number: r}
 			w, _ := eo.Whom()
 			revokee := m[w]
 			revokee.revokee++
 			m[w] = revokee
 		}
 	}
-	for k, v := range m {
+	var ordered = []string{
+		"Herbert Hoover",
+		"Franklin D. Roosevelt",
+		"Harry S. Truman",
+		"Dwight D. Eisenhower",
+		"John F. Kennedy",
+		"Lyndon B. Johnson",
+		"Richard Nixon",
+		"Gerald R. Ford",
+		"Jimmy Carter",
+		"Ronald Reagan",
+		"George H. W. Bush",
+		"Bill Clinton",
+		"George W. Bush",
+		"Barack Obama",
+		"Donald J. Trump",
+	}
+
+	for _, k := range ordered {
+		v := m[k]
 		cout.Write([]string{
 			k,
 			fmt.Sprintf("%d", v.revoker),
