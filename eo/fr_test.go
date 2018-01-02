@@ -16,10 +16,7 @@ func TestReadFRData(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	n := 13814
 	for _, eo := range eos {
-		if eo.Number == n {
-			fmt.Println(eo)
-		}
+		fmt.Println(eo.President, eo.Number, eo.RevokeStrings(false))
 	}
 }

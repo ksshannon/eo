@@ -59,7 +59,7 @@ var starts = []struct {
 	{"Bill Clinton", 12834},
 	{"George W. Bush", 13198},
 	{"Barack Obama", 13489},
-	{"Donald J. Trump", 13758},
+	{"Donald J. Trump", 13765},
 }
 
 func whom(order int) (string, int) {

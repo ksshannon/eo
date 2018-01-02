@@ -36,7 +36,6 @@ func main() {
 	}
 
 	freos, err := eo.ParseFedRegData(*update)
-
 	if err != nil {
 		panic(err)
 	}
