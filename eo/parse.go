@@ -23,6 +23,11 @@ import (
 	"golang.org/x/net/html"
 )
 
+// ParseExecOrdersIn reads the orders from the data folder for the specified
+// year.  If the year isn't in the data folder, or any other error is
+// encountered, a nil slice is returned.
+//
+// TODO(kyle): return a valid error on error
 func ParseExecOrdersIn(year int) []ExecOrder {
 	fname := filepath.Join(".", "data", fmt.Sprintf("%d.txt", year))
 	st, err := os.Stat(fname)
@@ -121,6 +126,12 @@ func ParseExecOrders(r io.Reader) []ExecOrder {
 		return nil
 	}
 	return eos[1:]
+}
+
+// ParseAllExecOrders parses all of the internal text orders, then parses the
+// internal JSON files.  Finally, it makes a web request for any new orders
+func ParseAllExecOrders() []ExecOrder {
+	return nil
 }
 
 var archiveURL = url.URL{

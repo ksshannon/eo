@@ -19,6 +19,7 @@ func init() {
 
 // Source: https://www.archives.gov/federal-register/executive-orders
 
+// ExecOrder represents a single order issued by a president
 type ExecOrder struct {
 	Number    int               `json:"number",yaml:"number"`
 	Suffix    string            `json:"suffix",yaml:"suffix"`
@@ -28,6 +29,8 @@ type ExecOrder struct {
 	Signed    time.Time         `json:"signed",yaml:"signed"`
 }
 
+// String returns a formated order that closely matches the format from
+// Roosevelt to 1994, when the federal register takes over.
 func (eo ExecOrder) String() string {
 	s := fmt.Sprintf("Executive Order %d%s\n", eo.Number, eo.Suffix)
 	s += eo.Title + "\n\n"
@@ -80,6 +83,9 @@ func (e *ExecOrder) Whom() (string, int) {
 	return whom(e.Number)
 }
 
+// Return the order numbers of the orders that an order revokes
+//
+// TODO(kyle): return a full EO, so we can have the suffix.
 func (e *ExecOrder) Revokes() []int {
 	var n []int
 	s := e.Notes["Revokes"]
