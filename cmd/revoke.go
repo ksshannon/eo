@@ -35,12 +35,14 @@ func main() {
 		panic(err)
 	}
 
-	freos, err := eo.ParseFedRegData(*update)
-	if err != nil {
-		panic(err)
-	}
-
-	eos = append(eos, freos...)
+	_ = *update
+	/*
+		freos, err := eo.ParseFedRegData(*update)
+		if err != nil {
+			panic(err)
+		}
+		eos = append(eos, freos...)
+	*/
 
 	m := make(map[string]revokeCounts)
 

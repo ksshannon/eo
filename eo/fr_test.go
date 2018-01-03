@@ -5,7 +5,6 @@
 package eo
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -17,6 +16,7 @@ func TestReadFRData(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, eo := range eos {
-		fmt.Println(eo.President, eo.Number, eo.RevokeStrings(false))
+		_ = eo
+		//fmt.Println(eo.President, eo.Number, eo.RevokeStrings(false))
 	}
 }

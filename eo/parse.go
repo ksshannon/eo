@@ -80,6 +80,7 @@ const (
 	// The federalregister.gov data starts at this eo number, don't parse past
 	// this.
 	firstFR = 12893
+	useFR   = false
 )
 
 var delimitRE = regexp.MustCompile(`^Executive Order [0-9]+(-?[A-Z])?$`)
@@ -104,7 +105,7 @@ func ParseExecOrders(r io.Reader) []ExecOrder {
 			if err != nil {
 				log.Print(err)
 			}
-			if e.Number >= firstFR {
+			if useFR && e.Number >= firstFR {
 				break
 			}
 			e.Suffix = matches[2]
