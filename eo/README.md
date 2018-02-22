@@ -13,5 +13,6 @@ the whole process goes:
 1. Navigate to the archive.gov [disposition tables](https://www.archives.gov/federal-register/executive-orders/disposition)
 2. Locate the last recorded order, and copy paste all following orders into the
    appropriate file
-3. Build the export command `go build cmd/export.go` from the root of the repo
-4. Run the command `./export -f csv eo.csv`
+3. Build the export command `go build cmd/export.go` from the eo folder
+4. Run the command `./export -f csv eo.csv` to generate a csv file of executive
+   order information
