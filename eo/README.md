@@ -16,3 +16,7 @@ the whole process goes:
 3. Build the export command `go build cmd/export.go` from the eo folder
 4. Run the command `./export -f csv eo.csv` to generate a csv file of executive
    order information
+
+An automagic scraper is planned for the archive.org data at some point.
+If/when the federalregister.gov data is updated, that should be the main source
+for new data due to the easily accessible API.
