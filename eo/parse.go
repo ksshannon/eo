@@ -120,6 +120,9 @@ func ParseExecOrders(r io.Reader) []ExecOrder {
 			e.Title = text
 		} else {
 			tokens := strings.Split(text, ":")
+			for i, t := range tokens {
+				tokens[i] = strings.TrimSpace(t)
+			}
 			if len(tokens) > 1 {
 				if tokens[0] == "Signed" {
 					e.Signed, err = parseSigned(tokens[1])
