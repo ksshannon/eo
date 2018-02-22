@@ -14,7 +14,7 @@ the whole process goes:
 2. Locate the last recorded order, and copy paste all following orders into the
    appropriate file
 3. Build the export command `go build cmd/export.go` from the eo folder
-4. Run the command `./export -f csv eo.csv` to generate a csv file of executive
+4. Run the command `./export -f csv > eo.csv` to generate a csv file of executive
    order information
 
 An automagic scraper is planned for the archive.org data at some point.
