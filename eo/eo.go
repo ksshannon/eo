@@ -17,6 +17,21 @@ func init() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 }
 
+var revokeTags = []string{
+	"Revoked (in part) by",
+	"Revoked by",
+	"Revoked by in part and supplemented by",
+	"Revoked by in part by",
+	"Revoked in part and supplemented by",
+	"Revoked in part by",
+	"Revoked in pary by",
+	"Revoked part by",
+	"Revokes",
+	"Revokes advisory committees established by",
+	"Revokes in part",
+	"Revokes in part and supplements",
+}
+
 var noteTypos = map[string]struct {
 	count   int
 	correct string

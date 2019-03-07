@@ -5,8 +5,6 @@
 package eo
 
 import (
-	"fmt"
-	"sort"
 	"testing"
 )
 
@@ -53,7 +51,6 @@ func TestString(t *testing.T) {
 }
 
 func TestNoteKeys(t *testing.T) {
-	t.Skip("used to inspect keys")
 	keys := map[string]int{}
 	eos, err := ParseAllOrders("./data")
 	if err != nil {
@@ -64,12 +61,9 @@ func TestNoteKeys(t *testing.T) {
 			keys[k]++
 		}
 	}
-	sorted := []string{}
-	for k := range keys {
-		sorted = append(sorted, k)
-	}
-	sort.Strings(sorted)
-	for _, k := range sorted {
-		fmt.Printf("%s: %d\n", k, keys[k])
+	for k, _ := range keys {
+		if _, ok := noteTypos[k]; !ok {
+			t.Errorf("unknown key: %s (%d)", k, keys[k])
+		}
 	}
 }
