@@ -6,22 +6,41 @@ package eo
 
 import (
 	"bufio"
-	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
-	"net/http"
-	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
-
-	"golang.org/x/net/html"
 )
+
+type frEO struct {
+	Count       int64  `json:"count"`
+	Description string `json:"description"`
+	Results     []struct {
+		BodyHTMLURL          string `json:"body_html_url"`
+		Citation             string `json:"citation"`
+		DispositionNotes     string `json:"disposition_notes"`
+		DocumentNumber       string `json:"document_number"`
+		EndPage              int64  `json:"end_page"`
+		ExecutiveOrderNumber int64  `json:"executive_order_number"`
+		FullTextXMLURL       string `json:"full_text_xml_url"`
+		HTMLURL              string `json:"html_url"`
+		JSONURL              string `json:"json_url"`
+		PdfURL               string `json:"pdf_url"`
+		PublicationDate      string `json:"publication_date"`
+		SigningDate          string `json:"signing_date"`
+		StartPage            int64  `json:"start_page"`
+		Subtype              string `json:"subtype"`
+		Title                string `json:"title"`
+		Type                 string `json:"type"`
+	} `json:"results"`
+	TotalPages int64 `json:"total_pages"`
+}
 
 // ParseExecOrdersIn reads the orders from the data folder for the specified
 // year.  If the year isn't in the data folder, or any other error is
@@ -42,22 +61,65 @@ func ParseExecOrdersIn(year int) []ExecOrder {
 	return ParseExecOrders(fin)
 }
 
-func ParseAllOrders(path string) ([]ExecOrder, error) {
-	dataFiles, err := ioutil.ReadDir(path)
-	if err != nil {
-		return nil, err
+var noteMatch = regexp.MustCompile(`[A-Za-z ]+:`)
+
+func parseFRNotes(s string) map[string]string {
+	m := map[string]string{}
+	match := noteMatch.FindAllStringIndex(s, -1)
+	for i := 0; i < len(match); i++ {
+		var a, b int
+		a = match[i][1]
+		if i < len(match)-1 {
+			b = match[i+1][0]
+		} else {
+			b = len(s)
+		}
+		key := strings.TrimSpace(s[match[i][0]:match[i][1]])
+		key = key[:len(key)-1]
+		m[key] = strings.TrimSpace(s[a:b])
 	}
+	return m
+}
 
-	// TODO(kyle): skip files that don't match a year pattern
-
+func ParseAllOrders(path string) ([]ExecOrder, error) {
+	var files []string
+	for i := 1937; i < 1994; i++ {
+		files = append(files, fmt.Sprintf("%d.txt", i))
+	}
 	var allOrders []ExecOrder
-	for _, fname := range dataFiles {
-		fin, err := os.Open(filepath.Join(path, fname.Name()))
+	for _, f := range files {
+		fin, err := os.Open(filepath.Join(path, f))
 		if err != nil {
 			return nil, err
 		}
-		defer fin.Close()
 		allOrders = append(allOrders, ParseExecOrders(fin)...)
+		fin.Close()
+	}
+
+	fin, err := os.Open(filepath.Join(path, "fr.json"))
+	if err != nil {
+		return nil, err
+	}
+	defer fin.Close()
+	var fr frEO
+	err = json.NewDecoder(fin).Decode(&fr)
+	if err != nil {
+		return nil, err
+	}
+	for _, feo := range fr.Results {
+		w, n := whom(int(feo.ExecutiveOrderNumber))
+		if n < 0 {
+			return nil, fmt.Errorf("invalid eo: %d", feo.ExecutiveOrderNumber)
+		}
+		when, _ := time.Parse("2006-01-02", feo.SigningDate)
+		allOrders = append(allOrders, ExecOrder{
+			Notes:     parseFRNotes(feo.DispositionNotes),
+			Number:    int(feo.ExecutiveOrderNumber),
+			President: w,
+			Signed:    when,
+			Suffix:    "",
+			Title:     feo.Title,
+		})
 	}
 	return allOrders, nil
 }
@@ -73,15 +135,6 @@ func parseSigned(s string) (time.Time, error) {
 	}
 	return time.Parse("January 2, 2006", s)
 }
-
-const (
-	delimiter = "Executive Order"
-
-	// The federalregister.gov data starts at this eo number, don't parse past
-	// this.
-	firstFR = 12893
-	useFR   = false
-)
 
 var delimitRE = regexp.MustCompile(`^Executive Order [0-9]+(-?[A-Z])?$`)
 
@@ -104,9 +157,6 @@ func ParseExecOrders(r io.Reader) []ExecOrder {
 			e.Number, err = strconv.Atoi(matches[1])
 			if err != nil {
 				log.Print(err)
-			}
-			if useFR && e.Number >= firstFR {
-				break
 			}
 			e.Suffix = matches[2]
 			if e.Suffix != "" && e.Suffix[0] == '-' {
@@ -139,89 +189,4 @@ func ParseExecOrders(r io.Reader) []ExecOrder {
 		return nil
 	}
 	return eos[1:]
-}
-
-// ParseAllExecOrders parses all of the internal text orders, then parses the
-// internal JSON files.  Finally, it makes a web request for any new orders
-func ParseAllExecOrders() []ExecOrder {
-	return nil
-}
-
-var archiveURL = url.URL{
-	Scheme: "https",
-	Host:   "www.archives.gov",
-	Path:   "/federal-register/executive-orders/{{YEAR}}-{{WHOM}}.html",
-}
-
-var archiveResolv = []struct {
-	year int
-	name string
-}{
-	{1933, "roosevelt"},
-	//{2009, "obama"},
-}
-
-// The Executive Orders in the web pages appear like:
-//<p><a name="13490"></a> <strong><a class="pdfImage" href="http://www.gpo.gov/fdsys/pkg/FR-2009-01-26/pdf/E9-1719.pdf">Executive Order 13490</a></strong><br />
-//  Ethics Commitments by Executive Branch Personnel</p>
-//
-//<ul>
-//  <li>Signed: January 21, 2009</li>
-//  <li>Federal Register page and date: 74 FR 4673, January 26, 2009</li>
-//  <li>Superseded by: <a href="/federal-register/executive-orders/2017-trump#13770">EO 13770</a>, January 28, 2017</li>
-//</ul>
-//
-//<hr />
-//
-// The anchor holds the EO number It appears we can grab it from the name
-// attribute.
-//
-func parseWeb() ([]ExecOrder, error) {
-	var eos []ExecOrder
-	for _, ar := range archiveResolv {
-		u := archiveURL
-		u.Path = strings.Replace(u.Path, "{{YEAR}}", strconv.Itoa(ar.year), 1)
-		u.Path = strings.Replace(u.Path, "{{WHOM}}", ar.name, 1)
-		resp, err := http.Get(u.String())
-		if err != nil {
-			return nil, err
-		}
-		defer resp.Body.Close()
-
-		t := html.NewTokenizer(resp.Body)
-		if t == nil {
-			return nil, io.EOF
-		}
-		var eo ExecOrder
-		for tkn := t.Next(); tkn != html.ErrorToken; tkn = t.Next() {
-			if tkn != html.TextToken {
-				continue
-			}
-			text := string(bytes.TrimSpace(t.Text()))
-			// This is the title of the EO
-			if delimitRE.MatchString(text) {
-				eo.Notes = map[string]string{}
-				eo.Number, err = strconv.Atoi(strings.Fields(text)[2])
-				if err != nil {
-					return nil, err
-				}
-				t.Next()
-				eo.Title = string(t.Text())
-				tkn = t.Next()
-				text = string(t.Text())
-				eo.Notes = map[string]string{}
-				for tkn != html.ErrorToken && !delimitRE.MatchString(text) {
-					fmt.Println("XXX", text)
-					k := strings.Split(text, ":")
-					if len(k) == 2 {
-						eo.Notes[k[0]] = k[1]
-					}
-					tkn = t.Next()
-					text = string(t.Text())
-				}
-				eos = append(eos, eo)
-			}
-		}
-	}
-	return eos, nil
 }

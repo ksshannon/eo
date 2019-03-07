@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -316,22 +317,69 @@ func TestSigned(t *testing.T) {
 	}
 }
 
-func TestWeb(t *testing.T) {
-	eos, err := parseWeb()
-	if err != nil {
-		t.Error(err)
+func TestFRNoteMatch(t *testing.T) {
+	tests := []struct {
+		s string
+		m map[string]string
+	}{
+		{
+			s: `Supersedes: EO 12869, September 30, 1993; Revokes: EO 12878, November 5, 1993; Superseded by: EO 13062, September 29, 1997; See: EO 12887, December 23, 1993; EO 12912, April 29, 1994`,
+			m: map[string]string{
+				"Supersedes":    "EO 12869, September 30, 1993;",
+				"Revokes":       "EO 12878, November 5, 1993;",
+				"Superseded by": "EO 13062, September 29, 1997;",
+				"See":           "EO 12887, December 23, 1993; EO 12912, April 29, 1994",
+			},
+		},
 	}
-	for _, eo := range eos {
-		fmt.Println(eo)
+	for _, test := range tests {
+		m := parseFRNotes(test.s)
+		for k, v := range m {
+			if test.m[k] != v {
+				t.Errorf("got: %s:%s, want: %s:%s\n", k, v, k, test.m[k])
+			}
+		}
 	}
 }
 
-func BenchmarkParse(b *testing.B) {
-	var eos []ExecOrder
-	for i := 0; i < b.N; i++ {
-		eos = ParseExecOrdersIn(1946)
-		if eos == nil {
-			b.Fatal("no eos")
+func TestFRData(t *testing.T) {
+	tests := []ExecOrder{
+		{
+			Notes: map[string]string{
+				"See":                   "EO 13303, May 22, 2003; EO 13364, November 29, 2004; EO 13438, July 17, 2007; Notice of May 20, 2004; Notice of May 19, 2005; Notice of May 18, 2006; Notice of May 18, 2007; Notice of May 20, 2008; Notice of May 19, 2009; Notice of May 12, 2010; EO 13668, May 27, 2014;",
+				"Superseded in part by": "EO 13350, July 29, 2004",
+			},
+			Number:    13315,
+			President: "George W. Bush",
+			Signed:    time.Date(2003, 8, 28, 0, 0, 0, 0, time.UTC),
+			Suffix:    "",
+			Title:     "Blocking Property of the Former Iraqi Regime, Its Senior Officials and Their Family Members, and Taking Certain Other Actions",
+		},
+		{
+			Notes:     map[string]string{},
+			Number:    13735,
+			President: "Barack Obama",
+			Signed:    time.Date(2016, 8, 12, 0, 0, 0, 0, time.UTC),
+			Suffix:    "",
+			Title:     "Providing an Order of Succession Within the Department of the Treasury",
+		},
+	}
+	eos, err := ParseAllOrders("./data")
+	if err != nil {
+		t.Fatal(err)
+	}
+	m := map[int]int{}
+	for i, eo := range eos {
+		m[eo.Number] = i
+	}
+	for _, test := range tests {
+		i, ok := m[test.Number]
+		if !ok {
+			t.Errorf("failed to parse eo: %d", test.Number)
+		}
+		got := eos[i]
+		if !reflect.DeepEqual(test, got) {
+			t.Errorf("failed to parse fr eo data, got: %+v, want: %+v", got, test)
 		}
 	}
 }
