@@ -37,7 +37,7 @@ func main() {
 	m := make(map[string]revokeCounts)
 
 	for _, e := range eos {
-		w, _ := e.Whom()
+		w := e.Whom()
 		if w == "Unknown" {
 			fmt.Printf("%+v\n", e)
 		}
@@ -48,28 +48,28 @@ func main() {
 		m[w] = who
 		for _, r := range revoked {
 			eo := eo.ExecOrder{Number: r}
-			w, _ := eo.Whom()
+			w := eo.Whom()
 			revokee := m[w]
 			revokee.revokee++
 			m[w] = revokee
 		}
 	}
 	var ordered = []string{
-		Hoover,
-		Roosevelt,
-		Truman,
-		Eisenhower,
-		Kennedy,
-		Johnson,
-		Nixon,
-		Ford,
-		Carter,
-		Reagan,
-		BushHW,
-		Clinton,
-		BushW,
-		Obama,
-		Trump,
+		eo.Hoover,
+		eo.Roosevelt,
+		eo.Truman,
+		eo.Eisenhower,
+		eo.Kennedy,
+		eo.Johnson,
+		eo.Nixon,
+		eo.Ford,
+		eo.Carter,
+		eo.Reagan,
+		eo.BushHW,
+		eo.Clinton,
+		eo.BushW,
+		eo.Obama,
+		eo.Trump,
 	}
 
 	for _, k := range ordered {
