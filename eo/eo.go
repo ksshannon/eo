@@ -11,6 +11,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/shenwei356/util/math"
 )
 
 func init() {
@@ -159,45 +161,42 @@ func (eo ExecOrder) String() string {
 	return s
 }
 
-var starts = []struct {
+var tenures = []struct {
 	whom  string
 	start int
+	end   int
 }{
-	{Hoover, 5075}, // No actual data for HH, just the EO #
-	{Roosevelt, 6071},
-	{Truman, 9538},
-	{Eisenhower, 10432},
-	{Kennedy, 10914},
-	{Johnson, 11128},
-	{Nixon, 11452},
-	{Ford, 11798},
-	{Carter, 11967},
-	{Reagan, 12287},
-	{BushHW, 12668},
-	{Clinton, 12834},
-	{BushW, 13198},
-	{Obama, 13489},
-	{Trump, 13765},
+	{Hoover, 5075, 6070}, // No actual data for HH, just the EO #
+	{Roosevelt, 6071, 9537},
+	{Truman, 9538, 10431},
+	{Eisenhower, 10432, 10913},
+	{Kennedy, 10914, 11127},
+	{Johnson, 11128, 11451},
+	{Nixon, 11452, 11797},
+	{Ford, 11798, 11966},
+	{Carter, 11967, 12286},
+	{Reagan, 12287, 12667},
+	{BushHW, 12668, 12833},
+	{Clinton, 12834, 13197},
+	{BushW, 13198, 13488},
+	{Obama, 13489, 13764},
+	{Trump, 13765, math.MaxInt},
 }
 
-func whom(order int) (string, int) {
-	if order < starts[0].start {
-		return "Unknown", -1
-	}
-	var i int
-	for i = 1; i < len(starts); i++ {
-		if starts[i].start > order {
-			return starts[i-1].whom, i
+func whom(order int) string {
+	for _, s := range tenures {
+		if order >= s.start && order <= s.end {
+			return s.whom
 		}
 	}
-	return starts[len(starts)-1].whom, i
+	return "Unknown"
 }
 
 var eoMatch = regexp.MustCompile(`([0-9]+)(-?[A-Z])?`)
 var revokeMatch = regexp.MustCompile(`EO [0-9]+`)
 var numMatch = regexp.MustCompile(`[0-9]+`)
 
-func (e *ExecOrder) Whom() (string, int) {
+func (e *ExecOrder) Whom() string {
 	return whom(e.Number)
 }
 

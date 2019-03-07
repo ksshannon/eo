@@ -16,20 +16,29 @@ func TestWhom(t *testing.T) {
 		{Roosevelt, 6071},
 		{Roosevelt, 9537},
 		{Truman, 9540},
+		{Carter, 11968},
 		{Reagan, 12300},
+		{BushHW, 12668},
+		{BushHW, 12833},
+		{Clinton, 12944},
+		{Clinton, 12987},
+		{BushW, 13198},
+		{BushW, 13488},
 		{Obama, 13489},
 		{Obama, 13490},
 		{Obama, 13500},
+		{Obama, 13764},
+		{Trump, 13765},
 		{Trump, 20000},
 	}
 	var e ExecOrder
 	for _, test := range tests {
-		w, _ := whom(test.i)
+		w := whom(test.i)
 		if w != test.name {
 			t.Errorf("failed whom: %+v (got %s)", test, w)
 		}
 		e.Number = test.i
-		w, _ = e.Whom()
+		w = e.Whom()
 		if w != test.name {
 			t.Errorf("failed Whom: %+v (got %s)", test, w)
 		}

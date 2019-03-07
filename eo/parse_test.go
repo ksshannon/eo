@@ -168,7 +168,7 @@ func TestAlphaEO(t *testing.T) {
 	for _, e := range eos {
 		if e.Number == 7677 && e.Suffix == "A" {
 			found = true
-			if w, _ := e.Whom(); w != "Franklin D. Roosevelt" {
+			if w := e.Whom(); w != "Franklin D. Roosevelt" {
 				t.Errorf("Whom failed on AlphaEO: %s", w)
 			}
 		}
@@ -207,7 +207,7 @@ func TestCount(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, e := range eos {
-		w, _ := e.Whom()
+		w := e.Whom()
 		m[w]++
 	}
 }

@@ -112,10 +112,7 @@ func ParseAllOrders(path string) ([]ExecOrder, error) {
 		return nil, err
 	}
 	for _, feo := range fr.Results {
-		w, n := whom(int(feo.ExecutiveOrderNumber))
-		if n < 0 {
-			return nil, fmt.Errorf("invalid eo: %d", feo.ExecutiveOrderNumber)
-		}
+		w := whom(int(feo.ExecutiveOrderNumber))
 		when, _ := time.Parse("2006-01-02", feo.SigningDate)
 		allOrders = append(allOrders, ExecOrder{
 			Notes:     parseFRNotes(feo.DispositionNotes),
@@ -162,7 +159,7 @@ func ParseExecOrders(r io.Reader) []ExecOrder {
 			continue
 		}
 		if delimitRE.MatchString(text) {
-			e.President, _ = e.Whom()
+			e.President = e.Whom()
 			eos = append(eos, e)
 			// Add support for the suffix extraction
 			matches := eoMatch.FindStringSubmatch(text)
