@@ -5,6 +5,7 @@
 package eo
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -12,15 +13,15 @@ func TestWhom(t *testing.T) {
 	tests := []struct {
 		name string
 		i    int
-	}{{"Unknown", 1},
-		{"Franklin D. Roosevelt", 6071},
-		{"Franklin D. Roosevelt", 9537},
-		{"Harry S. Truman", 9540},
-		{"Ronald Reagan", 12300},
-		{"Barack Obama", 13489}, // FIXME(kyle): failing
-		{"Barack Obama", 13490},
-		{"Barack Obama", 13500},
-		{"Donald J. Trump", 20000},
+	}{{Unknown, 1},
+		{Roosevelt, 6071},
+		{Roosevelt, 9537},
+		{Truman, 9540},
+		{Reagan, 12300},
+		{Obama, 13489},
+		{Obama, 13490},
+		{Obama, 13500},
+		{Trump, 20000},
 	}
 	var e ExecOrder
 	for _, test := range tests {
@@ -41,11 +42,27 @@ func TestString(t *testing.T) {
 		Number: 9414,
 		Title:  "Regulations Relating to Annual and Sick Leave of Government Employees",
 		Notes: map[string]string{
-			"Signed": "January 13, 1944",
+			"Signed":                         "January 13, 1944",
 			"Federal Register page and date": "9 FR 623, January 18, 1944",
 			"Supersedes":                     "EO 8384, March 29, 1940; EO 8385, March 29, 1940; EO 9307, March 3, 1943; EO 9371, August 24, 1943",
 			"Note":                           "The authority of this Executive order was repealed by the Annual and Sick Leave Act of 1951.",
 		},
 	}
 	_ = eo
+}
+
+func TestNoteKeys(t *testing.T) {
+	keys := map[string]struct{}{}
+	eos, err := ParseAllOrders("./data")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, eo := range eos {
+		for k := range eo.Notes {
+			keys[k] = struct{}{}
+		}
+	}
+	for k := range keys {
+		fmt.Println(k)
+	}
 }

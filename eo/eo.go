@@ -29,12 +29,30 @@ type ExecOrder struct {
 	Signed    time.Time         `json:"signed",yaml:"signed"`
 }
 
+const (
+	Unknown    = "Unknown"
+	Hoover     = "Herbert Hoover"
+	Roosevelt  = "Franklin D. Roosevelt"
+	Truman     = "Harry S. Truman"
+	Eisenhower = "Dwight D. Eisenhower"
+	Kennedy    = "John F. Kennedy"
+	Johnson    = "Lyndon B. Johnson"
+	Nixon      = "Richard Nixon"
+	Ford       = "Gerald R. Ford"
+	Carter     = "Jimmy Carter"
+	Reagan     = "Ronald Reagan"
+	BushHW     = "George H. W. Bush"
+	Clinton    = "Bill Clinton"
+	BushW      = "George W. Bush"
+	Obama      = "Barack Obama"
+	Trump      = "Donald J. Trump"
+)
+
 // String returns a formated order that closely matches the format from
 // Roosevelt to 1994, when the federal register takes over.
 func (eo ExecOrder) String() string {
 	s := fmt.Sprintf("Executive Order %d%s\n", eo.Number, eo.Suffix)
 	s += eo.Title + "\n\n"
-	//TODO(kyle): order keys
 	for k, v := range eo.Notes {
 		s += "    " + fmt.Sprintf("%s: %v\n", k, v)
 	}
@@ -45,21 +63,21 @@ var starts = []struct {
 	whom  string
 	start int
 }{
-	{"Herbert Hoover", 5075}, // No actual data for HH, just the EO #
-	{"Franklin D. Roosevelt", 6071},
-	{"Harry S. Truman", 9538},
-	{"Dwight D. Eisenhower", 10432},
-	{"John F. Kennedy", 10914},
-	{"Lyndon B. Johnson", 11128},
-	{"Richard Nixon", 11452},
-	{"Gerald R. Ford", 11798},
-	{"Jimmy Carter", 11967},
-	{"Ronald Reagan", 12287},
-	{"George H. W. Bush", 12668},
-	{"Bill Clinton", 12834},
-	{"George W. Bush", 13198},
-	{"Barack Obama", 13489},
-	{"Donald J. Trump", 13765},
+	{Hoover, 5075}, // No actual data for HH, just the EO #
+	{Roosevelt, 6071},
+	{Truman, 9538},
+	{Eisenhower, 10432},
+	{Kennedy, 10914},
+	{Johnson, 11128},
+	{Nixon, 11452},
+	{Ford, 11798},
+	{Carter, 11967},
+	{Reagan, 12287},
+	{BushHW, 12668},
+	{Clinton, 12834},
+	{BushW, 13198},
+	{Obama, 13489},
+	{Trump, 13765},
 }
 
 func whom(order int) (string, int) {

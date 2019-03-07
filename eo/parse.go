@@ -61,7 +61,7 @@ func ParseExecOrdersIn(year int) []ExecOrder {
 	return ParseExecOrders(fin)
 }
 
-var noteMatch = regexp.MustCompile(`[A-Za-z ]+:`)
+var noteMatch = regexp.MustCompile(`[A-Za-z\(\) ]+:`)
 
 func parseFRNotes(s string) map[string]string {
 	m := map[string]string{}
@@ -76,6 +76,10 @@ func parseFRNotes(s string) map[string]string {
 		}
 		key := strings.TrimSpace(s[match[i][0]:match[i][1]])
 		key = key[:len(key)-1]
+		if key == "ee" {
+			// Fix for typo, see TestFRNoteMatch()
+			key = "See"
+		}
 		m[key] = strings.TrimSpace(s[a:b])
 	}
 	return m
@@ -146,7 +150,7 @@ func ParseExecOrders(r io.Reader) []ExecOrder {
 	scn := bufio.NewScanner(r)
 	for scn.Scan() {
 		text := strings.TrimSpace(scn.Text())
-		if text == "" || strings.Index(text, "#") == 1 {
+		if text == "" || text[0] == '#' {
 			continue
 		}
 		if delimitRE.MatchString(text) {

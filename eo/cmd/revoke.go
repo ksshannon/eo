@@ -6,8 +6,8 @@ package main
 
 import (
 	"encoding/csv"
-	"flag"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/ksshannon/mc/eo"
@@ -20,7 +20,6 @@ type revokeCounts struct {
 }
 
 func main() {
-	update := flag.Bool("u", false, "update the local json data before running")
 	fout := os.Stdout
 	cout := csv.NewWriter(fout)
 	cout.Write([]string{
@@ -32,17 +31,8 @@ func main() {
 
 	eos, err := eo.ParseAllOrders("./data")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
-
-	_ = *update
-	/*
-		freos, err := eo.ParseFedRegData(*update)
-		if err != nil {
-			panic(err)
-		}
-		eos = append(eos, freos...)
-	*/
 
 	m := make(map[string]revokeCounts)
 

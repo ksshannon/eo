@@ -331,12 +331,35 @@ func TestFRNoteMatch(t *testing.T) {
 				"See":           "EO 12887, December 23, 1993; EO 12912, April 29, 1994",
 			},
 		},
+		{
+			s: `Amends: EO 13043, April 16, 1997; EO 13231, October 16, 2001; EO 13515, October 14, 2009; EO 13538, April 19, 2010; EO 13600, February 9, 2012;
+ Supersedes in part: EO 13585, September 30, 2011; EO 13591, November 23, 2011;  EO 13708, September 30, 2015
+ Continues: EO 11145, March 7, 1964; EO 11183, October 3, 1964; EO 11287, June 28, 1966; EO 11612, July 26, 1971; EO 12131, May 4, 1979; EO 12216, June 19, 1980; EO 12367, June 15, 1982; EO 12382, September 13, 1982; EO 12829, January 6, 1993; EO 12905, March 25, 1994; EO 12994, March 21, 1996; EO 13231, October 16, 2001; EO 13265, June 6, 2002; EO 13515, October 14, 2009; EO 13521, November 24, 2009; EO 13522, December 9, 2009; EO 13532, February 26, 2010; EO 13538, April 19, 2010; EO 13539, April 21, 2010; EO 13540, April 26, 2010; EO 13549, August 18, 2010; EO 13600, February 9, 2012; EO 13621, July 26, 2012; EO 13631, December 7, 2012; EO 13634, December 21, 2012; EO 13640, January 5, 2013;
+ ee: EO 13498, February 5, 2009; EO 13544, June 10, 2010; EO 13555, October 19, 2010`,
+			m: map[string]string{
+				"Amends":             "EO 13043, April 16, 1997; EO 13231, October 16, 2001; EO 13515, October 14, 2009; EO 13538, April 19, 2010; EO 13600, February 9, 2012;",
+				"Supersedes in part": "EO 13585, September 30, 2011; EO 13591, November 23, 2011;  EO 13708, September 30, 2015",
+				"Continues":          "EO 11145, March 7, 1964; EO 11183, October 3, 1964; EO 11287, June 28, 1966; EO 11612, July 26, 1971; EO 12131, May 4, 1979; EO 12216, June 19, 1980; EO 12367, June 15, 1982; EO 12382, September 13, 1982; EO 12829, January 6, 1993; EO 12905, March 25, 1994; EO 12994, March 21, 1996; EO 13231, October 16, 2001; EO 13265, June 6, 2002; EO 13515, October 14, 2009; EO 13521, November 24, 2009; EO 13522, December 9, 2009; EO 13532, February 26, 2010; EO 13538, April 19, 2010; EO 13539, April 21, 2010; EO 13540, April 26, 2010; EO 13549, August 18, 2010; EO 13600, February 9, 2012; EO 13621, July 26, 2012; EO 13631, December 7, 2012; EO 13634, December 21, 2012; EO 13640, January 5, 2013;",
+				// This is a typo on the data, we are assumming it is See:
+				// A fix is in the parseFRNotes as a special case.
+				// Original data:
+				// "ee": "EO 13498, February 5, 2009; EO 13544, June 10, 2010; EO 13555, October 19, 2010",
+				// Fixed:
+				"See": "EO 13498, February 5, 2009; EO 13544, June 10, 2010; EO 13555, October 19, 2010",
+			},
+		},
+		{
+			s: "Revoked (in part) by: EO 13316, September 17, 2003",
+			m: map[string]string{
+				"Revoked (in part) by": "EO 13316, September 17, 2003",
+			},
+		},
 	}
 	for _, test := range tests {
 		m := parseFRNotes(test.s)
 		for k, v := range m {
 			if test.m[k] != v {
-				t.Errorf("got: %s:%s, want: %s:%s\n", k, v, k, test.m[k])
+				t.Errorf("got:\n%s:%s, want:\n%s:%s\n", k, v, k, test.m[k])
 			}
 		}
 	}
