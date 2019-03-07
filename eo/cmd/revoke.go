@@ -55,21 +55,21 @@ func main() {
 		}
 	}
 	var ordered = []string{
-		"Herbert Hoover",
-		"Franklin D. Roosevelt",
-		"Harry S. Truman",
-		"Dwight D. Eisenhower",
-		"John F. Kennedy",
-		"Lyndon B. Johnson",
-		"Richard Nixon",
-		"Gerald R. Ford",
-		"Jimmy Carter",
-		"Ronald Reagan",
-		"George H. W. Bush",
-		"Bill Clinton",
-		"George W. Bush",
-		"Barack Obama",
-		"Donald J. Trump",
+		Hoover,
+		Roosevelt,
+		Truman,
+		Eisenhower,
+		Kennedy,
+		Johnson,
+		Nixon,
+		Ford,
+		Carter,
+		Reagan,
+		BushHW,
+		Clinton,
+		BushW,
+		Obama,
+		Trump,
 	}
 
 	for _, k := range ordered {

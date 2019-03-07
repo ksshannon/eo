@@ -6,6 +6,7 @@ package eo
 
 import (
 	"fmt"
+	"sort"
 	"testing"
 )
 
@@ -52,17 +53,23 @@ func TestString(t *testing.T) {
 }
 
 func TestNoteKeys(t *testing.T) {
-	keys := map[string]struct{}{}
+	t.Skip("used to inspect keys")
+	keys := map[string]int{}
 	eos, err := ParseAllOrders("./data")
 	if err != nil {
 		t.Fatal(err)
 	}
 	for _, eo := range eos {
 		for k := range eo.Notes {
-			keys[k] = struct{}{}
+			keys[k]++
 		}
 	}
+	sorted := []string{}
 	for k := range keys {
-		fmt.Println(k)
+		sorted = append(sorted, k)
+	}
+	sort.Strings(sorted)
+	for _, k := range sorted {
+		fmt.Printf("%s: %d\n", k, keys[k])
 	}
 }

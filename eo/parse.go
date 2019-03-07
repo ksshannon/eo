@@ -13,6 +13,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -76,9 +77,9 @@ func parseFRNotes(s string) map[string]string {
 		}
 		key := strings.TrimSpace(s[match[i][0]:match[i][1]])
 		key = key[:len(key)-1]
-		if key == "ee" {
-			// Fix for typo, see TestFRNoteMatch()
-			key = "See"
+		typo := noteTypos[key]
+		if typo.count < 2 && typo.correct != "" {
+			key = typo.correct
 		}
 		m[key] = strings.TrimSpace(s[a:b])
 	}
@@ -125,6 +126,13 @@ func ParseAllOrders(path string) ([]ExecOrder, error) {
 			Title:     feo.Title,
 		})
 	}
+	// The FR orders are stored most current first, lets sort them all.
+	sort.Slice(allOrders, func(i, j int) bool {
+		if allOrders[i].Number == allOrders[j].Number {
+			return allOrders[i].Suffix < allOrders[j].Suffix
+		}
+		return allOrders[i].Number < allOrders[j].Number
+	})
 	return allOrders, nil
 }
 

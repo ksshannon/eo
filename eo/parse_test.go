@@ -5,11 +5,7 @@
 package eo
 
 import (
-	"encoding/csv"
-	"fmt"
-	"io/ioutil"
 	"os"
-	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
@@ -40,31 +36,6 @@ func TestEODelimitMatch(t *testing.T) {
 			t.Errorf("invalid match: %s returned %t", test.s, test.b)
 		}
 	}
-}
-
-func TestEONumberSubmatch(t *testing.T) {
-	t.Skip("write me")
-	/*
-		tests := []struct {
-			s string
-			m []string
-		}{
-			{"1234", []string{"1234", "", ""}},
-			{"1234A", []string{"1234A", "1234", "A"}},
-			{"1234B", []string{"1234B", "1234", "B"}},
-			{"1234-A", []string{"1234", "1234", "-A"}},
-			{"1234AA", []string{"", "", ""}},
-			{"1234-AA", []string{"", "", ""}},
-		}
-		for _, test := range tests {
-			m := delimitRE.SubMatchString(test.s)
-			for i, mm := range m {
-				if mm != test.m[i] {
-					t.Errorf("invalid match: %s returned %t", mm, test.m[i])
-				}
-			}
-		}
-	*/
 }
 
 func TestParse1937(t *testing.T) {
@@ -165,47 +136,25 @@ func TestShortEONumber(t *testing.T) {
 }
 
 func TestRevokesInPart(t *testing.T) {
-	t.Skip()
-	dataFiles, err := ioutil.ReadDir("./data")
-
+	t.Skip("not needed, looking for conflicts")
+	eos, err := ParseAllOrders("./data")
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	fout := os.Stdout
-	cout := csv.NewWriter(fout)
-	cout.Write([]string{
-		"eo",
-		"title",
-		"president",
-		"revokes",
-	})
-
-	conflict := 0
-
-	for _, fname := range dataFiles {
-		fin, err := os.Open(filepath.Join("data", fname.Name()))
-		if err != nil {
-			panic(err)
-		}
-		defer fin.Close()
-
-		eos := ParseExecOrders(fin)
-		if eos == nil {
-			t.Fatal(fmt.Sprintf("failed to parse %s", fname.Name()))
-		}
-		for _, e := range eos {
-			if _, hasInPart := e.Notes["Revokes in part"]; hasInPart == true {
-				if strings.Index("in part", strings.ToLower(e.Notes["Revokes"])) >= 0 {
-					t.Logf("file: %s eo: %d has revokes(in part): %s and revokes: %s",
-						fname.Name(), e.Number, e.Notes["Revokes"], e.Notes["Revokes in part"])
-					conflict++
-				}
+	total := 0
+	for _, e := range eos {
+		n := 0
+		for k := range e.Notes {
+			if strings.Contains(strings.ToLower(k), "revoke") {
+				n++
 			}
 		}
+		if n > 1 {
+			total++
+		}
 	}
-	if conflict > 0 {
-		t.Logf("%d conflicts in revoke/revoke in part", conflict)
+	if total > 0 {
+		t.Logf("%d orders have multiple revoke clauses", total)
 	}
 }
 
