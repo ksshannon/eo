@@ -205,13 +205,16 @@ func (e *ExecOrder) Whom() string {
 // TODO(kyle): return a full EO, so we can have the suffix.
 func (e *ExecOrder) Revokes() []int {
 	var n []int
-	s := e.Notes["Revokes"]
-	tokens := strings.Split(s, ";")
-	for _, t := range tokens {
-		if m := revokeMatch.FindString(t); m != "" {
-			eon, err := strconv.Atoi(m[len("EO "):])
-			if err == nil {
-				n = append(n, eon)
+	for k, v := range e.Notes {
+		if strings.Contains(strings.ToLower(k), "revokes") {
+			tokens := strings.Split(v, ";")
+			for _, t := range tokens {
+				if m := revokeMatch.FindString(t); m != "" {
+					eon, err := strconv.Atoi(m[len("EO "):])
+					if err == nil {
+						n = append(n, eon)
+					}
+				}
 			}
 		}
 	}
