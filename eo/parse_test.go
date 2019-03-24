@@ -201,15 +201,11 @@ func Test9379(t *testing.T) {
 }
 
 func TestCount(t *testing.T) {
-	m := make(map[string]int)
 	eos, err := ParseAllOrders("./data")
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, e := range eos {
-		w := e.Whom()
-		m[w]++
-	}
+	t.Logf("executive order count: %d", len(eos))
 }
 
 func TestRevokeString(t *testing.T) {

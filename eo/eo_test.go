@@ -76,11 +76,3 @@ func TestNoteKeys(t *testing.T) {
 		}
 	}
 }
-
-func TestCount(t *testing.T) {
-	eos, err := ParseAllOrders("./data")
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Logf("Executive Order count: %d", len(eos))
-}
