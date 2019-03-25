@@ -123,8 +123,9 @@ var noteTypos = map[string]struct {
 
 // ExecOrder represents a single order issued by a president
 type ExecOrder struct {
-	Number    int               `json:"number",yaml:"number"`
-	Suffix    string            `json:"suffix",yaml:"suffix"`
+	// Executive order number, some have a trailing alpha character such as 'A',
+	// or '-A'
+	Number    string            `json:"number",yaml:"number"`
 	Notes     map[string]string `json:"notes",yaml:"notes"`
 	Title     string            `json:"title",yaml:"title"`
 	President string            `json:"president",yaml:"president"`
@@ -153,7 +154,7 @@ const (
 // String returns a formated order that closely matches the format from
 // Roosevelt to 1994, when the federal register takes over.
 func (eo ExecOrder) String() string {
-	s := fmt.Sprintf("Executive Order %d%s\n", eo.Number, eo.Suffix)
+	s := fmt.Sprintf("Executive Order %s\n", eo.Number)
 	s += eo.Title + "\n\n"
 	for k, v := range eo.Notes {
 		s += "    " + fmt.Sprintf("%s: %v\n", k, v)
@@ -197,7 +198,24 @@ var revokeMatch = regexp.MustCompile(`EO [0-9]+`)
 var numMatch = regexp.MustCompile(`[0-9]+`)
 
 func (e *ExecOrder) Whom() string {
-	return whom(e.Number)
+	if e.Number == "" {
+		return Unknown
+	}
+	var err error
+	s := e.Number
+	n := len(e.Number)
+	if n == 0 {
+		panic("invalid number:" + s)
+	}
+	c := s[n-1]
+	if c >= 'A' && c <= 'Z' {
+		s = s[:n-1]
+	}
+	n, err = strconv.Atoi(s)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return whom(n)
 }
 
 // Return the order numbers of the orders that an order revokes

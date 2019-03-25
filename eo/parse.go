@@ -116,18 +116,14 @@ func ParseAllOrders(path string) ([]ExecOrder, error) {
 		when, _ := time.Parse("2006-01-02", feo.SigningDate)
 		allOrders = append(allOrders, ExecOrder{
 			Notes:     parseFRNotes(feo.DispositionNotes),
-			Number:    int(feo.ExecutiveOrderNumber),
+			Number:    strconv.Itoa(int(feo.ExecutiveOrderNumber)),
 			President: w,
 			Signed:    when,
-			Suffix:    "",
 			Title:     feo.Title,
 		})
 	}
 	// The FR orders are stored most current first, lets sort them all.
 	sort.Slice(allOrders, func(i, j int) bool {
-		if allOrders[i].Number == allOrders[j].Number {
-			return allOrders[i].Suffix < allOrders[j].Suffix
-		}
 		return allOrders[i].Number < allOrders[j].Number
 	})
 	return allOrders, nil
@@ -145,7 +141,7 @@ func parseSigned(s string) (time.Time, error) {
 	return time.Parse("January 2, 2006", s)
 }
 
-var delimitRE = regexp.MustCompile(`^Executive Order [0-9]+(-?[A-Z])?$`)
+var delimitRE = regexp.MustCompile(`^Executive Order [0-9]+([\-A-Z]+)?$`)
 
 func ParseExecOrders(r io.Reader) []ExecOrder {
 	var e ExecOrder
@@ -162,14 +158,10 @@ func ParseExecOrders(r io.Reader) []ExecOrder {
 			e.President = e.Whom()
 			eos = append(eos, e)
 			// Add support for the suffix extraction
-			matches := eoMatch.FindStringSubmatch(text)
-			e.Number, err = strconv.Atoi(matches[1])
+			fmt.Println(text)
+			e.Number = eoMatch.FindString(text)
 			if err != nil {
 				log.Print(err)
-			}
-			e.Suffix = matches[2]
-			if e.Suffix != "" && e.Suffix[0] == '-' {
-				e.Suffix = e.Suffix[1:]
 			}
 			e.Title = ""
 			e.Notes = make(map[string]string)

@@ -45,8 +45,8 @@ func TestParse1937(t *testing.T) {
 	}
 	// Check the data in the first order
 	e := eos[0]
-	if e.Number != 7532 {
-		t.Errorf("incorrect number: %d", e.Number)
+	if e.Number != "7532" {
+		t.Errorf("incorrect number: %s", e.Number)
 	}
 	if strings.Index(e.Title, "Shinnecock") < 0 {
 		t.Errorf("incorrect title: %s", e.Title)
@@ -73,7 +73,7 @@ func TestParse1983(t *testing.T) {
 	// Find 12407, it should be revoke 12314
 	found := false
 	for _, e := range eos {
-		if e.Number == 12407 {
+		if e.Number == "12407" {
 			found = true
 			if strings.Index(e.Notes["Revokes"], "12314") < 0 {
 				t.Errorf("invalid revokes note: %s", e.Notes["Revokes"])
@@ -94,7 +94,7 @@ func TestMultiRevoke(t *testing.T) {
 	found := false
 	// Find 12148, revokes many orders, including 10242
 	for _, e := range eos {
-		if e.Number == 12148 {
+		if e.Number == "12148" {
 			revokes := e.Revokes()
 			for _, n := range revokes {
 				if n == 10242 {
@@ -120,7 +120,7 @@ func TestShortEONumber(t *testing.T) {
 	found := false
 	// Find 12553, revokes many orders, including a short EO number, 723
 	for _, e := range eos {
-		if e.Number == 12553 {
+		if e.Number == "12553" {
 			revokes := e.Revokes()
 			for _, n := range revokes {
 				if n == 723 {
@@ -166,7 +166,7 @@ func TestAlphaEO(t *testing.T) {
 	}
 	found := false
 	for _, e := range eos {
-		if e.Number == 7677 && e.Suffix == "A" {
+		if e.Number == "7677A" {
 			found = true
 			if w := e.Whom(); w != "Franklin D. Roosevelt" {
 				t.Errorf("Whom failed on AlphaEO: %s", w)
@@ -184,7 +184,7 @@ func Test9379(t *testing.T) {
 	if eos == nil {
 		t.Fatal("failed to parse")
 	}
-	const n = 9379
+	const n = "9379"
 	var found bool
 	for _, e := range eos {
 		if e.Number == n {
@@ -213,7 +213,7 @@ func TestRevokeString(t *testing.T) {
 	var found bool
 	var eo ExecOrder
 	for _, e := range eos {
-		if e.Number == 8346 {
+		if e.Number == "8346" {
 			eo = e
 			found = true
 			break
@@ -245,12 +245,12 @@ func TestRevokeString(t *testing.T) {
 
 func TestSigned(t *testing.T) {
 	tests := []struct {
-		n int
+		n string
 		s time.Time
 	}{
-		{7726, time.Date(1937, 10, 12, 0, 0, 0, 0, time.UTC)},
+		{"7726", time.Date(1937, 10, 12, 0, 0, 0, 0, time.UTC)},
 		// Two 'Signed' keys
-		{7729, time.Date(1937, 10, 16, 0, 0, 0, 0, time.UTC)},
+		{"7729", time.Date(1937, 10, 16, 0, 0, 0, 0, time.UTC)},
 	}
 	eos := ParseExecOrdersIn(1937)
 	for _, test := range tests {
@@ -317,18 +317,16 @@ func TestFRData(t *testing.T) {
 				"See":                   "EO 13303, May 22, 2003; EO 13364, November 29, 2004; EO 13438, July 17, 2007; Notice of May 20, 2004; Notice of May 19, 2005; Notice of May 18, 2006; Notice of May 18, 2007; Notice of May 20, 2008; Notice of May 19, 2009; Notice of May 12, 2010; EO 13668, May 27, 2014;",
 				"Superseded in part by": "EO 13350, July 29, 2004",
 			},
-			Number:    13315,
+			Number:    "13315",
 			President: "George W. Bush",
 			Signed:    time.Date(2003, 8, 28, 0, 0, 0, 0, time.UTC),
-			Suffix:    "",
 			Title:     "Blocking Property of the Former Iraqi Regime, Its Senior Officials and Their Family Members, and Taking Certain Other Actions",
 		},
 		{
 			Notes:     map[string]string{},
-			Number:    13735,
+			Number:    "13735",
 			President: "Barack Obama",
 			Signed:    time.Date(2016, 8, 12, 0, 0, 0, 0, time.UTC),
-			Suffix:    "",
 			Title:     "Providing an Order of Succession Within the Department of the Treasury",
 		},
 	}
@@ -336,14 +334,14 @@ func TestFRData(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	m := map[int]int{}
+	m := map[string]int{}
 	for i, eo := range eos {
 		m[eo.Number] = i
 	}
 	for _, test := range tests {
 		i, ok := m[test.Number]
 		if !ok {
-			t.Errorf("failed to parse eo: %d", test.Number)
+			t.Errorf("failed to parse eo: %s", test.Number)
 		}
 		got := eos[i]
 		if !reflect.DeepEqual(test, got) {
