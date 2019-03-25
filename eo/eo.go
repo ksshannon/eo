@@ -196,7 +196,7 @@ var eoMatch = regexp.MustCompile(`([0-9]+)(-?[A-Z])?`)
 var revokeMatch = regexp.MustCompile(`EO [0-9]+`)
 var numMatch = regexp.MustCompile(`[0-9]+`)
 
-func (e *ExecOrder) Whom() string {
+func (e ExecOrder) Whom() string {
 	return whom(e.Number)
 }
 

@@ -9,24 +9,52 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/ksshannon/mc/eo"
 )
 
-type revokeCounts struct {
-	total   int
-	revoker int
-	revokee int
-}
+// Desired output:
+//
+// eo - executive order where the e.o. revocation originates
+//
+// signed - date issued
+//
+// title - title of order
+//
+// president - who revoked
+//
+// revokes - which executive order the new order revokes
+//
+// revokee - which presidents' order is being revoked
+//
+// revokee id - a numeric code for each president
+//
+// full_revoke_comment - the text from archive.gov
+//
+// partial_revoke_comment - if the eo partially revokes a past eo (I am only
+// looking at full revokes)
+//
+// political party - indicates which party's order is being revoked. 0 is GOP,
+// 1 is Dem. -1 is for orders that were revoked before 1937.
 
 func main() {
 	fout := os.Stdout
 	cout := csv.NewWriter(fout)
+
 	cout.Write([]string{
+		"eo",
+		"signed",
+		"title",
 		"president",
-		"revoker",
+		"revokes",
 		"revokee",
-		"total",
+		// The names are *always* laundered so they are always the
+		// same, no need for a lookup
+		// "revokee_id",
+		"full_revoke_comment",
+		"partial_revoke_comment",
+		"political",
 	})
 
 	eos, err := eo.ParseAllOrders("./data")
@@ -34,52 +62,42 @@ func main() {
 		log.Fatal(err)
 	}
 
-	m := make(map[string]revokeCounts)
-
-	for _, e := range eos {
-		w := e.Whom()
-		if w == "Unknown" {
-			fmt.Printf("%+v\n", e)
+	// Create an index to look up EO by number
+	m := map[string]eo.ExecOrder{}
+	for _, eo := range eos {
+		eon := fmt.Sprintf("%d%s", eo.Number, eo.Suffix)
+		// check for duplicates (suffix?)
+		if _, ok := m[eon]; ok {
+			log.Printf("duplicate eo entry: %+v", eo)
 		}
-		who := m[w]
-		who.total++
-		revoked := e.Revokes()
-		who.revoker += len(revoked)
-		m[w] = who
-		for _, r := range revoked {
-			eo := eo.ExecOrder{Number: r}
-			w := eo.Whom()
-			revokee := m[w]
-			revokee.revokee++
-			m[w] = revokee
+		m[eon] = eo
+	}
+	for _, eo := range eos {
+		revokes := eo.RevokeStrings(true)
+		if len(revokes) < 1 {
+			continue
 		}
-	}
-	var ordered = []string{
-		eo.Hoover,
-		eo.Roosevelt,
-		eo.Truman,
-		eo.Eisenhower,
-		eo.Kennedy,
-		eo.Johnson,
-		eo.Nixon,
-		eo.Ford,
-		eo.Carter,
-		eo.Reagan,
-		eo.BushHW,
-		eo.Clinton,
-		eo.BushW,
-		eo.Obama,
-		eo.Trump,
-	}
-
-	for _, k := range ordered {
-		v := m[k]
-		cout.Write([]string{
-			k,
-			fmt.Sprintf("%d", v.revoker),
-			fmt.Sprintf("%d", v.revokee),
-			fmt.Sprintf("%d", v.total),
-		})
+		notes := []string{}
+		for k, v := range eo.Notes {
+			notes = append(notes, fmt.Sprintf("%s: %s", k, v))
+		}
+		for _, r := range revokes {
+			r = r[len("EO "):]
+			_, ok := m[r]
+			if !ok {
+				log.Printf("eo %d can't find revoked %s", eo.Number, r)
+			}
+			cout.Write([]string{
+				fmt.Sprintf("%d%s", eo.Number, eo.Suffix),
+				eo.Signed.Format("2006-01-02"),
+				eo.Whom(),
+				fmt.Sprintf("%s", r),
+				m[r].Whom(),
+				strings.Join(notes, ";"),
+				"skip",
+				"-2", // TBD
+			})
+		}
 	}
 	cout.Flush()
 }
