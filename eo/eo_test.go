@@ -11,29 +11,30 @@ import (
 func TestWhom(t *testing.T) {
 	tests := []struct {
 		name string
-		i    int
-	}{{Unknown, 1},
-		{Roosevelt, 6071},
-		{Roosevelt, 9537},
-		{Truman, 9540},
-		{Carter, 11968},
-		{Reagan, 12300},
-		{BushHW, 12668},
-		{BushHW, 12833},
-		{Clinton, 12944},
-		{Clinton, 12987},
-		{BushW, 13198},
-		{BushW, 13488},
-		{Obama, 13489},
-		{Obama, 13490},
-		{Obama, 13500},
-		{Obama, 13764},
-		{Trump, 13765},
-		{Trump, 20000},
+		i    string
+	}{{Unknown, "1"},
+		{Roosevelt, "6071"},
+		{Roosevelt, "9537"},
+		{Truman, "9540"},
+		{Carter, "11968"},
+		{Reagan, "12300"},
+		{BushHW, "12668"},
+		{BushHW, "12833"},
+		{Clinton, "12944"},
+		{Clinton, "12987"},
+		{BushW, "13198"},
+		{BushW, "13488"},
+		{Obama, "13489"},
+		{Obama, "13490"},
+		{Obama, "13500"},
+		{Obama, "13764"},
+		{Trump, "13765"},
+		{Trump, "20000"},
 	}
 	var e ExecOrder
 	for _, test := range tests {
-		w := whom(test.i)
+		eo := &ExecOrder{Number: test.i}
+		w := eo.Whom()
 		if w != test.name {
 			t.Errorf("failed whom: %+v (got %s)", test, w)
 		}
@@ -47,7 +48,7 @@ func TestWhom(t *testing.T) {
 
 func TestString(t *testing.T) {
 	eo := ExecOrder{
-		Number: 9414,
+		Number: "9414",
 		Title:  "Regulations Relating to Annual and Sick Leave of Government Employees",
 		Notes: map[string]string{
 			"Signed":                         "January 13, 1944",
