@@ -32,8 +32,8 @@ func TestEODelimitMatch(t *testing.T) {
 		{"Executive Order 1234-AA", false},
 	}
 	for _, test := range tests {
-		if delimitRE.MatchString(test.s) != test.b {
-			t.Errorf("invalid match: %s returned %t", test.s, test.b)
+		if got, want := delimitRE.MatchString(test.s), test.b; got != want {
+			t.Errorf("invalid match: %s, got: %t, want: %t", test.s, got, want)
 		}
 	}
 }
@@ -97,7 +97,7 @@ func TestMultiRevoke(t *testing.T) {
 		if e.Number == "12148" {
 			revokes := e.Revokes()
 			for _, n := range revokes {
-				if n == 10242 {
+				if n == "10242" {
 					found = true
 					break
 				}
@@ -123,7 +123,7 @@ func TestShortEONumber(t *testing.T) {
 		if e.Number == "12553" {
 			revokes := e.Revokes()
 			for _, n := range revokes {
-				if n == 723 {
+				if n == "723" {
 					found = true
 					break
 				}
@@ -166,7 +166,7 @@ func TestAlphaEO(t *testing.T) {
 	}
 	found := false
 	for _, e := range eos {
-		if e.Number == "7677A" {
+		if e.Number == "7677-A" {
 			found = true
 			if w := e.Whom(); w != "Franklin D. Roosevelt" {
 				t.Errorf("Whom failed on AlphaEO: %s", w)
@@ -346,6 +346,19 @@ func TestFRData(t *testing.T) {
 		got := eos[i]
 		if !reflect.DeepEqual(test, got) {
 			t.Errorf("failed to parse fr eo data, got: %+v, want: %+v", got, test)
+		}
+	}
+}
+
+func TestOrder(t *testing.T) {
+	eos, err := ParseAllOrders("./data")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i := 1; i < len(eos); i++ {
+		x, y := eos[i-1].AsInt(), eos[i].AsInt()
+		if x > y {
+			t.Errorf("bad order(%d, %d): %d > %d", i-1, i, x, y)
 		}
 	}
 }

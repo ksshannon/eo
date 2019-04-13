@@ -201,36 +201,31 @@ func (e *ExecOrder) Whom() string {
 	if e.Number == "" {
 		return Unknown
 	}
-	var err error
-	s := e.Number
-	n := len(e.Number)
-	if n == 0 {
-		panic("invalid number:" + s)
+	return whom(e.AsInt())
+}
+
+func (e ExecOrder) AsInt() int {
+	s := ""
+	for _, c := range e.Number {
+		if c < '0' || c > '9' {
+			break
+		}
+		s += string(c)
 	}
-	c := s[n-1]
-	if c >= 'A' && c <= 'Z' {
-		s = s[:n-1]
-	}
-	n, err = strconv.Atoi(s)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return whom(n)
+	x, _ := strconv.Atoi(s)
+	return x
 }
 
 // Return the order numbers of the orders that an order revokes
 //
 // TODO(kyle): return a full EO, so we can have the suffix.
-func (e *ExecOrder) Revokes() []int {
-	var n []int
+func (e *ExecOrder) Revokes() []string {
+	var n []string
 	s := e.Notes["Revokes"]
 	tokens := strings.Split(s, ";")
 	for _, t := range tokens {
 		if m := revokeMatch.FindString(t); m != "" {
-			eon, err := strconv.Atoi(m[len("EO "):])
-			if err == nil {
-				n = append(n, eon)
-			}
+			n = append(n, m[len("EO "):])
 		}
 	}
 	return n

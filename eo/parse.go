@@ -124,7 +124,7 @@ func ParseAllOrders(path string) ([]ExecOrder, error) {
 	}
 	// The FR orders are stored most current first, lets sort them all.
 	sort.Slice(allOrders, func(i, j int) bool {
-		return allOrders[i].Number < allOrders[j].Number
+		return allOrders[i].AsInt() < allOrders[j].AsInt()
 	})
 	return allOrders, nil
 }
@@ -141,7 +141,7 @@ func parseSigned(s string) (time.Time, error) {
 	return time.Parse("January 2, 2006", s)
 }
 
-var delimitRE = regexp.MustCompile(`^Executive Order [0-9]+([\-A-Z]+)?$`)
+var delimitRE = regexp.MustCompile(`^Executive Order [0-9]+(-)?([A-Z]{1})?$`)
 
 func ParseExecOrders(r io.Reader) []ExecOrder {
 	var e ExecOrder
@@ -158,7 +158,6 @@ func ParseExecOrders(r io.Reader) []ExecOrder {
 			e.President = e.Whom()
 			eos = append(eos, e)
 			// Add support for the suffix extraction
-			fmt.Println(text)
 			e.Number = eoMatch.FindString(text)
 			if err != nil {
 				log.Print(err)

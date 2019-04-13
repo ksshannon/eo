@@ -6,7 +6,6 @@ package main
 
 import (
 	"encoding/csv"
-	"fmt"
 	"log"
 	"os"
 
@@ -20,66 +19,49 @@ type revokeCounts struct {
 }
 
 func main() {
+
 	fout := os.Stdout
 	cout := csv.NewWriter(fout)
 	cout.Write([]string{
+		"eo",
+		"signed",
+		"title",
 		"president",
-		"revoker",
+		"revokes",
 		"revokee",
-		"total",
+		"revokee_id",
+		"full_revoke_comment",
+		"partial_revoke_comment",
+		"political party",
 	})
 
 	eos, err := eo.ParseAllOrders("./data")
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	m := make(map[string]revokeCounts)
-
-	for _, e := range eos {
-		w := e.Whom()
-		if w == "Unknown" {
-			fmt.Printf("%+v\n", e)
-		}
-		who := m[w]
-		who.total++
-		revoked := e.Revokes()
-		who.revoker += len(revoked)
-		m[w] = who
-		for _, r := range revoked {
-			eo := eo.ExecOrder{Number: r}
-			w := eo.Whom()
-			revokee := m[w]
-			revokee.revokee++
-			m[w] = revokee
-		}
-	}
-	var ordered = []string{
-		eo.Hoover,
-		eo.Roosevelt,
-		eo.Truman,
-		eo.Eisenhower,
-		eo.Kennedy,
-		eo.Johnson,
-		eo.Nixon,
-		eo.Ford,
-		eo.Carter,
-		eo.Reagan,
-		eo.BushHW,
-		eo.Clinton,
-		eo.BushW,
-		eo.Obama,
-		eo.Trump,
+	// build an index for easier lookup
+	m := map[string]eo.ExecOrder{}
+	for _, eo := range eos {
+		m[eo.Number] = eo
 	}
 
-	for _, k := range ordered {
-		v := m[k]
-		cout.Write([]string{
-			k,
-			fmt.Sprintf("%d", v.revoker),
-			fmt.Sprintf("%d", v.revokee),
-			fmt.Sprintf("%d", v.total),
-		})
+	for _, eo := range eos {
+		rvs := eo.Revokes()
+		for _, rv := range rvs {
+			r := m[rv]
+			cout.Write([]string{
+				eo.Number,
+				eo.Signed.Format("2006-01-02"),
+				eo.Title,
+				eo.Whom(),
+				r.Number,
+				r.Whom(),
+				"",
+				eo.Notes["Revokes"],
+				"",
+				"",
+			})
+		}
 	}
 	cout.Flush()
 }
