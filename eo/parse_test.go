@@ -5,6 +5,8 @@
 package eo
 
 import (
+	"fmt"
+	"math/rand"
 	"os"
 	"reflect"
 	"strings"
@@ -359,6 +361,23 @@ func TestOrder(t *testing.T) {
 		x, y := eos[i-1].AsInt(), eos[i].AsInt()
 		if x > y {
 			t.Errorf("bad order(%d, %d): %d > %d", i-1, i, x, y)
+		}
+	}
+}
+
+func TestSample(t *testing.T) {
+	eos, err := ParseAllOrders("./data")
+	if err != nil {
+		t.Fatal(err)
+	}
+	indices := rand.Perm(len(eos))
+	m := map[string]int{}
+	j := 0
+	for _, i := range indices {
+		fmt.Println(eos[i].Number)
+		m[eos[i].Whom()]++
+		if j == 60 {
+			break
 		}
 	}
 }

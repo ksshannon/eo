@@ -6,6 +6,7 @@ package main
 
 import (
 	"encoding/csv"
+	"fmt"
 	"log"
 	"os"
 
@@ -36,6 +37,26 @@ import (
 // political party - indicates which party's order is being revoked. 0 is GOP,
 // 1 is Dem. -1 is for orders that were revoked before 1937.
 
+// Numeric ID's for presidents
+var pids = map[string]string{
+	eo.Unknown:    "-1",
+	eo.Hoover:     "31",
+	eo.Roosevelt:  "32",
+	eo.Truman:     "33",
+	eo.Eisenhower: "34",
+	eo.Kennedy:    "35",
+	eo.Johnson:    "36",
+	eo.Nixon:      "37",
+	eo.Ford:       "38",
+	eo.Carter:     "39",
+	eo.Reagan:     "40",
+	eo.BushHW:     "41",
+	eo.Clinton:    "42",
+	eo.BushW:      "43",
+	eo.Obama:      "44",
+	eo.Trump:      "45",
+}
+
 func main() {
 
 	fout := os.Stdout
@@ -52,6 +73,7 @@ func main() {
 		"full_revoke_comment",
 		"partial_revoke_comment",
 		"political party",
+		"all_notes",
 	})
 
 	eos, err := eo.ParseAllOrders("./data")
@@ -67,6 +89,10 @@ func main() {
 
 	for _, eo := range eos {
 		rvs := eo.Revokes()
+		notes := ""
+		for k, v := range eo.Notes {
+			notes += fmt.Sprintf("%s: %s; ", k, v)
+		}
 		for _, rv := range rvs {
 			r := m[rv]
 			cout.Write([]string{
@@ -76,10 +102,11 @@ func main() {
 				eo.Whom(),
 				r.Number,
 				r.Whom(),
-				"",
+				pids[r.Whom()],
 				eo.Notes["Revokes"],
 				"",
 				"",
+				notes,
 			})
 		}
 	}
