@@ -7,12 +7,11 @@ package eo
 import (
 	"fmt"
 	"log"
+	"math"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/shenwei356/util/math"
 )
 
 func init() {
@@ -181,7 +180,7 @@ var tenures = []struct {
 	{Clinton, 12834, 13197},
 	{BushW, 13198, 13488},
 	{Obama, 13489, 13764},
-	{Trump, 13765, math.MaxInt},
+	{Trump, 13765, math.MaxInt32},
 }
 
 func whom(order int) string {
