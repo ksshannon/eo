@@ -33,7 +33,7 @@ func main() {
 		cout := csv.NewWriter(fout)
 		cout.Write([]string{
 			"number",
-			"suffix",
+			//"suffix",
 			"notes",
 			"title",
 			"president",
@@ -46,7 +46,7 @@ func main() {
 			}
 			cout.Write([]string{
 				fmt.Sprintf("%d", eo.Number),
-				eo.Suffix,
+				//eo.Suffix,
 				notes,
 				eo.Title,
 				eo.President,
